@@ -176,16 +176,16 @@ PCF8574::DigitalInput PCF8574::digitalReadAll(void){
 	DEBUG_PRINT("Buffer value ");
 	DEBUG_PRINTLN(byteBuffered, BIN);
 
-	if (bit(0)&readMode>0) digitalInput.p0 = (byteBuffered&bit(0)>0)?HIGH:LOW;
-	if (bit(1)&readMode>0) digitalInput.p1 = (byteBuffered&bit(1)>0)?HIGH:LOW;
-	if (bit(2)&readMode>0) digitalInput.p2 = (byteBuffered&bit(2)>0)?HIGH:LOW;
-	if (bit(3)&readMode>0) digitalInput.p3 = (byteBuffered&bit(3)>0)?HIGH:LOW;
-	if (bit(4)&readMode>0) digitalInput.p4 = (byteBuffered&bit(4)>0)?HIGH:LOW;
-	if (bit(5)&readMode>0) digitalInput.p5 = (byteBuffered&bit(5)>0)?HIGH:LOW;
-	if (bit(6)&readMode>0) digitalInput.p6 = (byteBuffered&bit(6)>0)?HIGH:LOW;
-	if (bit(7)&readMode>0) digitalInput.p7 = (byteBuffered&bit(7)>0)?HIGH:LOW;
+	if ((bit(0) & readMode)>0) digitalInput.p0 = ((byteBuffered & bit(0))>0)?HIGH:LOW;
+	if ((bit(1) & readMode)>0) digitalInput.p1 = ((byteBuffered & bit(1))>0)?HIGH:LOW;
+	if ((bit(2) & readMode)>0) digitalInput.p2 = ((byteBuffered & bit(2))>0)?HIGH:LOW;
+	if ((bit(3) & readMode)>0) digitalInput.p3 = ((byteBuffered & bit(3))>0)?HIGH:LOW;
+	if ((bit(4) & readMode)>0) digitalInput.p4 = ((byteBuffered & bit(4))>0)?HIGH:LOW;
+	if ((bit(5) & readMode)>0) digitalInput.p5 = ((byteBuffered & bit(5))>0)?HIGH:LOW;
+	if ((bit(6) & readMode)>0) digitalInput.p6 = ((byteBuffered & bit(6))>0)?HIGH:LOW;
+	if ((bit(7) & readMode)>0) digitalInput.p7 = ((byteBuffered & bit(7))>0)?HIGH:LOW;
 
-	if (readMode & byteBuffered>0){
+	if ((readMode & byteBuffered)>0){
 		byteBuffered = ~readMode & byteBuffered;
 		DEBUG_PRINT("Buffer hight value readed set readed ");
 		DEBUG_PRINTLN(byteBuffered, BIN);
