@@ -37,7 +37,7 @@ So to read all analog input in one trasmission you can do (even if I use  a 10mi
 	Serial.print(" - ");
 	Serial.print(di.p2);
 	Serial.print(" - ");
-	Serial.println(pi.p3);
+	Serial.println(di.p3);
 ```
 
 
