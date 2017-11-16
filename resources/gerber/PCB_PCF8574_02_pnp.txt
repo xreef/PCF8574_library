@@ -1,0 +1,35 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=PCB_PCF8574_02
+*Date=11:22:05
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;10k;THT;20.7653;-32.7071;0;Bottom;R5
+2;;;25.8454;-30.1671;0;Bottom;Via2
+3;;;12.3494;-40.8629;0;Bottom;TXT1
+4;;;25.8454;-17.467;0;Bottom;Via1
+5;;;26.0811;-2.00646;0;Bottom;TXT2
+6;;THT;28.3853;-25.0871;180;Bottom;INT SDA SCL
+7;;;13.1454;-7.30698;0;Bottom;Via3
+8;;;20.7654;-7.30698;0;Bottom;Via4
+9;10k;THT;18.2253;-35.2471;0;Bottom;R4
+10;10k;THT;30.9253;-12.3871;90;Bottom;R2
+11;;DIP16 [THT];16.9553;-18.7371;0;Bottom;U1
+12;10k;THT;30.9253;-32.7071;-90;Bottom;R1
+13;;dipswitch-02;4.25534;-28.8971;0;Bottom;SW1
+14;10k;THT;8.06534;-4.76707;0;Bottom;R6
+15;;THT;23.3053;-13.6571;180;Bottom;P4-P7
+16;;THT;27.1153;-35.2471;-90;Bottom;Power from controller
+17;;;27.1125;-41.038;0;Bottom;TXT1
+18;;THT;5.52534;-13.6571;180;Bottom;P0-P3
+19;;dipswitch-02;6.79534;-28.8971;0;Bottom;SW2
+20;10k;THT;28.3853;-12.3871;90;Bottom;R3
