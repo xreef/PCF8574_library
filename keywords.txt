@@ -12,10 +12,10 @@ PCF8574	KEYWORD1
 # Methods and Functions (KEYWORD2)
 ###########################################
 
-begin KEYWORD2
-pinMode KEYWORD2
+begin	KEYWORD2
+pinMode	KEYWORD2
 
-readBuffer KEYWORD2
-digitalRead KEYWORD2
-digitalReadAll KEYWORD2
-digitalWrite KEYWORD2
+readBuffer	KEYWORD2
+digitalRead	KEYWORD2
+digitalReadAll	KEYWORD2
+digitalWrite	KEYWORD2
