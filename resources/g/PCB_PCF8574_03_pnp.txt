@@ -1,0 +1,37 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=PCB_PCF8574_03
+*Date=22:59:49
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;10k;THT;21.1915;-32.7795;0;Bottom;Pull-down res A1
+2;10k;THT;8.4915;-4.83952;0;Bottom;Pull-down res A2
+3;;;26.2716;-17.5394;0;Bottom;Via1
+4;;;13.5715;-7.37942;0;Bottom;Via3
+5;;THT;5.9515;-13.7295;180;Bottom;P0-P3
+6;;THT;27.5415;-35.3195;-90;Bottom;Power from controller
+7;;DIP16 [THT];17.3815;-18.8095;0;Bottom;PCF8574
+8;;;26.2716;-30.2395;0;Bottom;Via2
+9;;;12.7755;-40.9353;0;Bottom;TXT1
+10;;;26.2715;-23.8895;0;Bottom;Jumper1
+11;;dipswitch-02;4.6815;-28.9695;0;Bottom;Adress i2c
+12;;;21.1915;-7.37951;0;Bottom;Via4
+13;;;27.5388;-41.1104;0;Bottom;TXT1
+14;10k;THT;18.6515;-35.3195;0;Bottom;Pull-down res A0
+15;;;17.3815;-7.37952;0;Bottom;Jumper2
+16;10k;THT;28.8115;-12.4595;90;Bottom;Pull-up int
+17;;THT;23.7315;-13.7295;180;Bottom;P4-P7
+18;;THT;28.8115;-25.1595;180;Bottom;INT SDA SCL
+19;10k;THT;31.3515;-12.4595;90;Bottom;Pull-up SDA
+20;;dipswitch-02;7.2215;-28.9695;0;Bottom;SW2
+21;10k;THT;31.3515;-32.7795;-90;Bottom;Pull-upp SCL
+22;;;26.5072;-2.07882;0;Bottom;TXT2
