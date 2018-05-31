@@ -1,11 +1,11 @@
-/** \mainpage Thermistor library
+/** \mainpage PCF8574 library
  *
  * MIT license
  * written by Renzo Mischianti
  */
 
-#ifndef Thermistor_h
-#define Thermistor_h
+#ifndef PCF8574_h
+#define PCF8574_h
 
 #include "Wire.h"
 
