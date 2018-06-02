@@ -18,6 +18,9 @@
 // Uncomment to enable printing out nice debug messages.
 // #define PCF8574_DEBUG
 
+// Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
+// #define PCF8574_LOW_MEMORY
+
 // Define where debug output will be printed.
 #define DEBUG_PRINTER Serial
 
@@ -55,16 +58,6 @@
 
 class PCF8574 {
 public:
-	struct DigitalInput {
-		uint8_t p0;
-		uint8_t p1;
-		uint8_t p2;
-		uint8_t p3;
-		uint8_t p4;
-		uint8_t p5;
-		uint8_t p6;
-		uint8_t p7;
-	} digitalInput;
 
 	PCF8574(uint8_t address);
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl);
@@ -77,7 +70,23 @@ public:
 
 	void readBuffer(bool force = true);
 	uint8_t digitalRead(uint8_t pin);
-	DigitalInput digitalReadAll(void);
+	#ifndef PCF8574_LOW_MEMORY
+		struct DigitalInput {
+			uint8_t p0;
+			uint8_t p1;
+			uint8_t p2;
+			uint8_t p3;
+			uint8_t p4;
+			uint8_t p5;
+			uint8_t p6;
+			uint8_t p7;
+		} digitalInput;
+
+
+		DigitalInput digitalReadAll(void);
+	#else
+		byte digitalReadAll(void);
+	#endif
 	void digitalWrite(uint8_t pin, uint8_t value);
 
 private:

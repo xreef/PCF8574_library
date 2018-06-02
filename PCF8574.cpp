@@ -149,50 +149,90 @@ void PCF8574::readBuffer(bool force){
 	}
 }
 
-/**
- * Read value of all INPUT pin
- * Debounce read more fast than 10millis, non managed for interrupt mode
- * @return
- */
-PCF8574::DigitalInput PCF8574::digitalReadAll(void){
-	DEBUG_PRINTLN("Read from buffer");
-	Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
-	lastReadMillis = millis();
-	if(Wire.available())   // If bytes are available to be recieved
-	{
-		  DEBUG_PRINTLN("Data ready");
-		  byte iInput = Wire.read();// Read a byte
+#ifndef PCF8574_LOW_MEMORY
+	/**
+	 * Read value of all INPUT pin
+	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * @return
+	 */
+	PCF8574::DigitalInput PCF8574::digitalReadAll(void){
+		DEBUG_PRINTLN("Read from buffer");
+		Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		lastReadMillis = millis();
+		if(Wire.available())   // If bytes are available to be recieved
+		{
+			  DEBUG_PRINTLN("Data ready");
+			  byte iInput = Wire.read();// Read a byte
 
-		  if ((iInput & readMode)>0){
-			  DEBUG_PRINT("Input ");
-			  DEBUG_PRINTLN((byte)iInput, BIN);
+			  if ((iInput & readMode)>0){
+				  DEBUG_PRINT("Input ");
+				  DEBUG_PRINTLN((byte)iInput, BIN);
 
-			  byteBuffered = byteBuffered | (byte)iInput;
-			  DEBUG_PRINT("byteBuffered ");
-			  DEBUG_PRINTLN(byteBuffered, BIN);
-		  }
-	}
+				  byteBuffered = byteBuffered | (byte)iInput;
+				  DEBUG_PRINT("byteBuffered ");
+				  DEBUG_PRINTLN(byteBuffered, BIN);
+			  }
+		}
 
-	DEBUG_PRINT("Buffer value ");
-	DEBUG_PRINTLN(byteBuffered, BIN);
-
-	if ((bit(0) & readMode)>0) digitalInput.p0 = ((byteBuffered & bit(0))>0)?HIGH:LOW;
-	if ((bit(1) & readMode)>0) digitalInput.p1 = ((byteBuffered & bit(1))>0)?HIGH:LOW;
-	if ((bit(2) & readMode)>0) digitalInput.p2 = ((byteBuffered & bit(2))>0)?HIGH:LOW;
-	if ((bit(3) & readMode)>0) digitalInput.p3 = ((byteBuffered & bit(3))>0)?HIGH:LOW;
-	if ((bit(4) & readMode)>0) digitalInput.p4 = ((byteBuffered & bit(4))>0)?HIGH:LOW;
-	if ((bit(5) & readMode)>0) digitalInput.p5 = ((byteBuffered & bit(5))>0)?HIGH:LOW;
-	if ((bit(6) & readMode)>0) digitalInput.p6 = ((byteBuffered & bit(6))>0)?HIGH:LOW;
-	if ((bit(7) & readMode)>0) digitalInput.p7 = ((byteBuffered & bit(7))>0)?HIGH:LOW;
-
-	if ((readMode & byteBuffered)>0){
-		byteBuffered = ~readMode & byteBuffered;
-		DEBUG_PRINT("Buffer hight value readed set readed ");
+		DEBUG_PRINT("Buffer value ");
 		DEBUG_PRINTLN(byteBuffered, BIN);
-	}
-	DEBUG_PRINT("Return value ");
-	return digitalInput;
-};
+
+		if ((bit(0) & readMode)>0) digitalInput.p0 = ((byteBuffered & bit(0))>0)?HIGH:LOW;
+		if ((bit(1) & readMode)>0) digitalInput.p1 = ((byteBuffered & bit(1))>0)?HIGH:LOW;
+		if ((bit(2) & readMode)>0) digitalInput.p2 = ((byteBuffered & bit(2))>0)?HIGH:LOW;
+		if ((bit(3) & readMode)>0) digitalInput.p3 = ((byteBuffered & bit(3))>0)?HIGH:LOW;
+		if ((bit(4) & readMode)>0) digitalInput.p4 = ((byteBuffered & bit(4))>0)?HIGH:LOW;
+		if ((bit(5) & readMode)>0) digitalInput.p5 = ((byteBuffered & bit(5))>0)?HIGH:LOW;
+		if ((bit(6) & readMode)>0) digitalInput.p6 = ((byteBuffered & bit(6))>0)?HIGH:LOW;
+		if ((bit(7) & readMode)>0) digitalInput.p7 = ((byteBuffered & bit(7))>0)?HIGH:LOW;
+
+		if ((readMode & byteBuffered)>0){
+			byteBuffered = ~readMode & byteBuffered;
+			DEBUG_PRINT("Buffer hight value readed set readed ");
+			DEBUG_PRINTLN(byteBuffered, BIN);
+		}
+		DEBUG_PRINT("Return value ");
+		return digitalInput;
+	};
+#else
+	/**
+	 * Read value of all INPUT pin in byte format for low memory usage
+	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * @return
+	 */
+	byte PCF8574::digitalReadAll(void){
+		DEBUG_PRINTLN("Read from buffer");
+		Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		lastReadMillis = millis();
+		if(Wire.available())   // If bytes are available to be recieved
+		{
+			  DEBUG_PRINTLN("Data ready");
+			  byte iInput = Wire.read();// Read a byte
+
+			  if ((iInput & readMode)>0){
+				  DEBUG_PRINT("Input ");
+				  DEBUG_PRINTLN((byte)iInput, BIN);
+
+				  byteBuffered = byteBuffered | (byte)iInput;
+				  DEBUG_PRINT("byteBuffered ");
+				  DEBUG_PRINTLN(byteBuffered, BIN);
+			  }
+		}
+
+		DEBUG_PRINT("Buffer value ");
+		DEBUG_PRINTLN(byteBuffered, BIN);
+
+		byte byteRead = byteBuffered;
+
+		if ((readMode & byteBuffered)>0){
+			byteBuffered = ~readMode & byteBuffered;
+			DEBUG_PRINT("Buffer hight value readed set readed ");
+			DEBUG_PRINTLN(byteBuffered, BIN);
+		}
+		DEBUG_PRINT("Return value ");
+		return byteRead;
+	};
+#endif
 
 /**
  * Read value of specified pin
