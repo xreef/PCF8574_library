@@ -40,6 +40,33 @@ So to read all analog input in one trasmission you can do (even if I use  a 10mi
 	Serial.println(di.p3);
 ```
 
+To follow a request (you can see It on [issue #5](https://github.com/xreef/PCF8574_library/issues/5)) I create a define variable to work with low memori device, if you decomment this line on .h file of the library:
+
+```cpp
+// #define PCF8574_LOW_MEMORY
+```
+
+Enable low memory props and gain about 7byte of memory, and you must use the method to read all like so:
+
+ ```cpp
+	byte di = pcf8574.digitalReadAll();
+	Serial.print("READ VALUE FROM PCF: ");
+	Serial.println(di, BIN);
+```
+
+where di is a byte like 1110001, so you must do a bitwise operation to get the data, operation that I already do in the "normal" mode, here an example:
+
+ ```cpp
+	p0 = ((di & bit(0))>0)?HIGH:LOW;
+	p1 = ((di & bit(1))>0)?HIGH:LOW;
+	p2 = ((di & bit(2))>0)?HIGH:LOW;
+	p3 = ((di & bit(3))>0)?HIGH:LOW;
+	p4 = ((di & bit(4))>0)?HIGH:LOW;
+	p5 = ((di & bit(5))>0)?HIGH:LOW;
+	p6 = ((di & bit(6))>0)?HIGH:LOW;
+	p7 = ((di & bit(7))>0)?HIGH:LOW;
+ ```
+ 
 
 if you want read a single input:
 

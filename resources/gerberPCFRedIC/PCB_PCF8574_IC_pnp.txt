@@ -1,0 +1,38 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=PCB_PCF8574_IC
+*Date=19:04:35
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;THT;18.8642;-23.7979;90;Bottom;S3
+2;;;23.9442;-13.6379;0;Bottom;Via4
+3;;THT;6.16418;-16.1779;0;Bottom;S1
+4;;;23.9443;-8.55783;0;Bottom;Via16
+5;;;23.9442;-16.1779;0;Bottom;Via3
+6;;DIP (Dual Inline) [THT];17.5942;-12.3679;180;Bottom;IC1
+7;;THT;8.70418;-23.7979;90;Bottom;S2
+8;;;6.16419;-28.8779;0;Bottom;Via2
+9;;;11.2442;-21.2579;0;Bottom;Via5
+10;;;23.9443;-11.0978;0;Bottom;Via14
+11;;;11.2442;-11.0979;0;Bottom;Via19
+12;;;6.16419;-21.2579;0;Bottom;Via6
+13;;;8.70418;-21.2579;0;Bottom;Jumper1
+14;;;11.2442;-13.6379;0;Bottom;Via9
+15;;;23.9442;-18.7179;0;Bottom;Via20
+16;;;23.9443;-6.01783;0;Bottom;Via13
+17;;;11.2442;-6.01792;0;Bottom;Via12
+18;;;11.2442;-26.3379;0;Bottom;Jumper2
+19;;;3.62419;-28.8779;0;Bottom;Via1
+20;;;17.3515;-10.6068;90;Bottom;TXT1
+21;;;23.9443;-3.47783;0;Bottom;Via15
+22;;;11.2442;-8.55792;0;Bottom;Via11
+23;;;7.50459;-6.05592;0;Bottom;TXT1
