@@ -4,8 +4,11 @@ Tutorial:
 
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
 
-# Reef complete PCF8574 digital input and output expander with i2c bus.
+# Reef complete PCF8574 PCF8574AP digital input and output expander with i2c bus.
 I try to simplify the use of this IC, with a minimal set of operation.
+
+PCF8574P address map 0x20-0x27 
+PCF8574AP address map 0x38-0x3f 
 
 Constructor:
 you must pas the address of i2c (to check the adress use this guide [I2cScanner](https://playground.arduino.cc/Main/I2cScanner)) 
