@@ -91,8 +91,14 @@ public:
 
 private:
 	uint8_t _address;
-	uint8_t _sda = SDA;
-	uint8_t _scl = SCL;
+
+	#if !defined(__AVR) && !defined(STM32F1)
+		uint8_t _sda;
+		uint8_t _scl;
+	#else
+		uint8_t _sda = SDA;
+		uint8_t _scl = SCL;
+	#endif
 
 	bool _usingInterrupt = false;
 	uint8_t _interruptPin = 2;
