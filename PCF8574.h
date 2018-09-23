@@ -92,7 +92,7 @@ public:
 private:
 	uint8_t _address;
 
-	#if !defined(__AVR) && !defined(STM32F1)
+	#if defined(__AVR) || defined(__STM32F1__)
 		uint8_t _sda;
 		uint8_t _scl;
 	#else
