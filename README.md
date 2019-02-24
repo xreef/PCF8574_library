@@ -1,4 +1,4 @@
-You can find docoment update at www.mischianti.org
+You can find document update at www.mischianti.org
 
 Library to use i2c analog IC with arduino and esp8266. Can read and write digital value with only 2 wire (perfect for ESP-01).
 
