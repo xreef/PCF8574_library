@@ -1,3 +1,10 @@
+/*
+ KeyPressed with interrupt
+ by Mischianti Renzo <http://www.mischianti.org>
+
+ https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
+*/
+
 #include "Arduino.h"
 #include "PCF8574.h"
 

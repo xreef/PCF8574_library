@@ -1,3 +1,30 @@
+/*
+ * PCF8574 GPIO Port Expand
+ * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017 Renzo Mischianti www.mischianti.org All right reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "PCF8574.h"
 #include "Wire.h"
 
@@ -6,6 +33,8 @@
  * @param address: i2c address
  */
 PCF8574::PCF8574(uint8_t address){
+	_wire = &Wire;
+
 	_address = address;
 };
 
@@ -16,6 +45,8 @@ PCF8574::PCF8574(uint8_t address){
  * @param interruptFunction: function to call when interrupt raised
  */
 PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() ){
+	_wire = &Wire;
+
 	_address = address;
 	_interruptPin = interruptPin;
 	_interruptFunction = interruptFunction;
@@ -30,6 +61,8 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	 * @param scl: scl pin
 	 */
 	PCF8574::PCF8574(uint8_t address, uint8_t sda, uint8_t scl){
+		_wire = &Wire;
+
 		_address = address;
 		_sda = sda;
 		_scl = scl;
@@ -44,6 +77,70 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
  	 * @param interruptFunction: function to call when interrupt raised
 	 */
 	PCF8574::PCF8574(uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)() ){
+		_wire = &Wire;
+
+		_address = address;
+		_sda = sda;
+		_scl = scl;
+
+		_interruptPin = interruptPin;
+		_interruptFunction = interruptFunction;
+
+		_usingInterrupt = true;
+	};
+#endif
+
+#ifdef ESP32
+	/**
+	 * Constructor
+	 * @param address: i2c address
+	 */
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address){
+		_wire = pWire;
+
+		_address = address;
+	};
+
+	/**
+	 * Construcor
+	 * @param address: i2c address
+	 * @param interruptPin: pin to set interrupt
+	 * @param interruptFunction: function to call when interrupt raised
+	 */
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() ){
+		_wire = pWire;
+
+		_address = address;
+		_interruptPin = interruptPin;
+		_interruptFunction = interruptFunction;
+		_usingInterrupt = true;
+	};
+
+	/**
+	 * Constructor
+	 * @param address: i2c address
+	 * @param sda: sda pin
+	 * @param scl: scl pin
+	 */
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, uint8_t sda, uint8_t scl){
+		_wire = pWire;
+
+		_address = address;
+		_sda = sda;
+		_scl = scl;
+	};
+
+	/**
+	 * Constructor
+	 * @param address: i2c address
+	 * @param sda: sda pin
+	 * @param scl: scl pin
+	 * @param interruptPin: pin to set interrupt
+	 * @param interruptFunction: function to call when interrupt raised
+	 */
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)() ){
+		_wire = pWire;
+
 		_address = address;
 		_sda = sda;
 		_scl = scl;
@@ -60,18 +157,18 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
  */
 void PCF8574::begin(){
 	#ifndef __AVR
-		Wire.begin(_sda, _scl);
+		_wire->begin(_sda, _scl);
 	#else
 	//			Default pin for AVR some problem on software emulation
 	//			#define SCL_PIN _scl
 	// 			#define SDA_PIN _sda
-		Wire.begin();
+		_wire->begin();
 	#endif
 
 	// Che if there are pins to set low
 	if (writeMode>0 || readMode>0){
 		DEBUG_PRINTLN("Set write mode");
-		Wire.beginTransmission(_address);
+		_wire->beginTransmission(_address);
 		DEBUG_PRINT(" ");
 		DEBUG_PRINT("usedPin pin ");
 
@@ -79,10 +176,10 @@ void PCF8574::begin(){
 		byte usedPin = writeMode | readMode;
 		DEBUG_PRINTLN( ~usedPin, BIN);
 
-		Wire.write(~usedPin);
+		_wire->write(~usedPin);
 
 		DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
-		Wire.endTransmission();
+		_wire->endTransmission();
 	}
 
 	// If using interrupt set interrupt value to pin
@@ -137,11 +234,11 @@ void PCF8574::pinMode(uint8_t pin, uint8_t mode){
  */
 void PCF8574::readBuffer(bool force){
 	if (millis() > PCF8574::lastReadMillis+READ_ELAPSED_TIME || _usingInterrupt || force){
-		Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
-		if(Wire.available())   // If bytes are available to be recieved
+		if(_wire->available())   // If bytes are available to be recieved
 		{
-			byte iInput = Wire.read();// Read a byte
+			byte iInput = _wire->read();// Read a byte
 			if ((iInput & readMode)>0){
 				byteBuffered = byteBuffered | (byte)iInput;
 			}
@@ -157,12 +254,12 @@ void PCF8574::readBuffer(bool force){
 	 */
 	PCF8574::DigitalInput PCF8574::digitalReadAll(void){
 		DEBUG_PRINTLN("Read from buffer");
-		Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
-		if(Wire.available())   // If bytes are available to be recieved
+		if(_wire->available())   // If bytes are available to be recieved
 		{
 			  DEBUG_PRINTLN("Data ready");
-			  byte iInput = Wire.read();// Read a byte
+			  byte iInput = _wire->read();// Read a byte
 
 			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
@@ -202,12 +299,12 @@ void PCF8574::readBuffer(bool force){
 	 */
 	byte PCF8574::digitalReadAll(void){
 		DEBUG_PRINTLN("Read from buffer");
-		Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
-		if(Wire.available())   // If bytes are available to be recieved
+		if(_wire->available())   // If bytes are available to be recieved
 		{
 			  DEBUG_PRINTLN("Data ready");
-			  byte iInput = Wire.read();// Read a byte
+			  byte iInput = _wire->read();// Read a byte
 
 			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
@@ -250,12 +347,12 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
 		value = HIGH;
 	 }else if ((/*(bit(pin) & byteBuffered)<=0 && */millis() > PCF8574::lastReadMillis+READ_ELAPSED_TIME) /*|| _usingInterrupt*/){
 		 DEBUG_PRINTLN("Read from buffer");
-		  Wire.requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
+		  _wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		  lastReadMillis = millis();
-		  if(Wire.available())   // If bytes are available to be recieved
+		  if(_wire->available())   // If bytes are available to be recieved
 		  {
 			  DEBUG_PRINTLN("Data ready");
-			  byte iInput = Wire.read();// Read a byte
+			  byte iInput = _wire->read();// Read a byte
 
 			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
@@ -291,7 +388,7 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
  */
 void PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 	DEBUG_PRINTLN("Begin trasmission");
-	Wire.beginTransmission(_address);     //Begin the transmission to PCF8574
+	_wire->beginTransmission(_address);     //Begin the transmission to PCF8574
 	if (value==HIGH){
 		writeByteBuffered = writeByteBuffered | bit(pin);
 	}else{
@@ -307,10 +404,10 @@ void PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 	DEBUG_PRINTLN(value);
 
 	writeByteBuffered = writeByteBuffered & writeMode;
-	Wire.write(writeByteBuffered);
+	_wire->write(writeByteBuffered);
 	DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
 
-	Wire.endTransmission();
+	_wire->endTransmission();
 };
 
 
