@@ -53,7 +53,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	_usingInterrupt = true;
 };
 
-#ifndef __AVR
+#if !defined(__AVR) && !defined(__STM32F1__)
 	/**
 	 * Constructor
 	 * @param address: i2c address
@@ -156,7 +156,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
  * wake up i2c controller
  */
 void PCF8574::begin(){
-	#ifndef __AVR
+	#if !defined(__AVR) && !defined(__STM32F1__)
 		_wire->begin(_sda, _scl);
 	#else
 	//			Default pin for AVR some problem on software emulation
@@ -165,7 +165,7 @@ void PCF8574::begin(){
 		_wire->begin();
 	#endif
 
-	// Che if there are pins to set low
+	// Check if there are pins to set low
 	if (writeMode>0 || readMode>0){
 		DEBUG_PRINTLN("Set write mode");
 		_wire->beginTransmission(_address);

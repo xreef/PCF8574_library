@@ -83,7 +83,7 @@ public:
 	PCF8574(uint8_t address);
 	PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() );
 
-#ifndef __AVR
+#if !defined(__AVR) && !defined(__STM32F1__)
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl);
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)());
 #endif
@@ -123,8 +123,14 @@ public:
 
 private:
 	uint8_t _address;
-	uint8_t _sda = SDA;
-	uint8_t _scl = SCL;
+
+	#if defined(__AVR) || defined(__STM32F1__)
+		uint8_t _sda;
+		uint8_t _scl;
+	#else
+		uint8_t _sda = SDA;
+		uint8_t _scl = SCL;
+	#endif
 
 	TwoWire *_wire;
 
