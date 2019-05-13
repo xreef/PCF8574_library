@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Additional information and document update here on my site: [pcf8574 Article](https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/).
-=======
-You can find document update at www.mischianti.org
->>>>>>> branch 'master' of https://github.com/xreef/PCF8574_library.git
 
 Library to use i2c analog IC with arduino and esp8266. Can read and write digital value with only 2 wire (perfect for ESP-01).
 
