@@ -83,7 +83,7 @@ public:
 	PCF8574(uint8_t address);
 	PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() );
 
-#if !defined(__AVR) && !defined(__STM32F1__)
+#if !defined(__AVR) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl);
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)());
 #endif

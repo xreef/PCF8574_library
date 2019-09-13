@@ -53,7 +53,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	_usingInterrupt = true;
 };
 
-#if !defined(__AVR) && !defined(__STM32F1__)
+#if !defined(__AVR) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
 	/**
 	 * Constructor
 	 * @param address: i2c address
@@ -156,7 +156,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
  * wake up i2c controller
  */
 void PCF8574::begin(){
-	#if !defined(__AVR) && !defined(__STM32F1__)
+	#if !defined(__AVR) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
 		_wire->begin(_sda, _scl);
 	#else
 	//			Default pin for AVR some problem on software emulation
