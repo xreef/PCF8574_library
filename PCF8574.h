@@ -36,6 +36,9 @@
 #include "WProgram.h"
 #endif
 
+#define DEFAULT_SDA SDA;
+#define DEFAULT_SCL SCL;
+
 // Uncomment to enable printing out nice debug messages.
 // #define PCF8574_DEBUG
 
@@ -124,13 +127,17 @@ public:
 private:
 	uint8_t _address;
 
-	#if defined(__AVR) || defined(__STM32F1__)
-		uint8_t _sda;
-		uint8_t _scl;
-	#else
-		uint8_t _sda = SDA;
-		uint8_t _scl = SCL;
+	#ifdef __STM32F1__
+	#ifndef SDA
+	#define DEFAULT_SDA PB7
+	#define DEFAULT_SCL PB6
 	#endif
+	#endif
+
+	uint8_t _sda = DEFAULT_SDA
+	;
+	uint8_t _scl = DEFAULT_SCL
+	;
 
 	TwoWire *_wire;
 
