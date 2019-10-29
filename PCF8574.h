@@ -145,9 +145,11 @@ private:
 	uint8_t _interruptPin = 2;
 	void (*_interruptFunction)(){};
 
-	byte writeMode 	= 	B00000000;
-	byte readMode 	= 	B00000000;
-	byte byteBuffered = B00000000;
+	byte writeMode 			= 	B00000000;
+	byte readMode 			= 	B00000000;
+	byte readModePullUp 	= 	B00000000;
+	byte readModePullDown 	= 	B00000000;
+	byte byteBuffered 		= 	B00000000;
 	unsigned long lastReadMillis = 0;
 
 	byte writeByteBuffered = B00000000;

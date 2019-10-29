@@ -173,7 +173,10 @@ void PCF8574::begin(){
 		DEBUG_PRINT("usedPin pin ");
 
 
-		byte usedPin = writeMode | readMode;
+		byte usedPin = writeMode | readModePullUp;
+		DEBUG_PRINTLN( writeMode, BIN);
+		DEBUG_PRINTLN( readModePullUp, BIN);
+		DEBUG_PRINTLN( readModePullDown, BIN);
 		DEBUG_PRINTLN( ~usedPin, BIN);
 
 		_wire->write(~usedPin);
@@ -206,18 +209,37 @@ void PCF8574::pinMode(uint8_t pin, uint8_t mode){
 
 	if (mode == OUTPUT){
 		writeMode = writeMode | bit(pin);
+
 		readMode =  readMode & ~bit(pin);
+		readModePullDown 	=	readModePullDown 	& 	~bit(pin);
+		readModePullUp 		=	readModePullUp 		& 	~bit(pin);
+
 		DEBUG_PRINT("writeMode: ");
 		DEBUG_PRINT(writeMode, BIN);
-		DEBUG_PRINT("readMode: ");
+		DEBUG_PRINT("readMode ALL: ");
 		DEBUG_PRINTLN(readMode, BIN);
 
 	}else if (mode == INPUT){
 		writeMode = writeMode & ~bit(pin);
-		readMode =   readMode | bit(pin);
+
+		readMode 			=   readMode 			| bit(pin);
+		readModePullDown 	=	readModePullDown 	| bit(pin);
+		readModePullUp 		=	readModePullUp 		& ~bit(pin);
+
 		DEBUG_PRINT("writeMode: ");
 		DEBUG_PRINT(writeMode, BIN);
-		DEBUG_PRINT("readMode: ");
+		DEBUG_PRINT("readMode ALL: ");
+		DEBUG_PRINTLN(readMode, BIN);
+	}else if (mode == INPUT_PULLUP){
+		writeMode = writeMode & ~bit(pin);
+
+		readMode 			=   readMode 			| bit(pin);
+		readModePullDown 	=	readModePullDown 	& ~bit(pin);
+		readModePullUp 		=	readModePullUp 		| bit(pin);
+
+		DEBUG_PRINT("writeMode: ");
+		DEBUG_PRINT(writeMode, BIN);
+		DEBUG_PRINT("readMode ALL: ");
 		DEBUG_PRINTLN(readMode, BIN);
 	}
 	else{
@@ -239,7 +261,8 @@ void PCF8574::readBuffer(bool force){
 		if(_wire->available())   // If bytes are available to be recieved
 		{
 			byte iInput = _wire->read();// Read a byte
-			if ((iInput & readMode)>0){
+			  if ((iInput & readModePullDown)>0 and (~iInput & readModePullUp)>0){
+//			  if ((iInput & readMode)>0){
 				byteBuffered = byteBuffered | (byte)iInput;
 			}
 		}
@@ -261,7 +284,8 @@ void PCF8574::readBuffer(bool force){
 			  DEBUG_PRINTLN("Data ready");
 			  byte iInput = _wire->read();// Read a byte
 
-			  if ((iInput & readMode)>0){
+			  if ((iInput & readModePullDown)>0 and (~iInput & readModePullUp)>0){
+//			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
 				  DEBUG_PRINTLN((byte)iInput, BIN);
 
@@ -283,7 +307,7 @@ void PCF8574::readBuffer(bool force){
 		if ((bit(6) & readMode)>0) digitalInput.p6 = ((byteBuffered & bit(6))>0)?HIGH:LOW;
 		if ((bit(7) & readMode)>0) digitalInput.p7 = ((byteBuffered & bit(7))>0)?HIGH:LOW;
 
-		if ((readMode & byteBuffered)>0){
+		if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
 			byteBuffered = ~readMode & byteBuffered;
 			DEBUG_PRINT("Buffer hight value readed set readed ");
 			DEBUG_PRINTLN(byteBuffered, BIN);
@@ -306,7 +330,8 @@ void PCF8574::readBuffer(bool force){
 			  DEBUG_PRINTLN("Data ready");
 			  byte iInput = _wire->read();// Read a byte
 
-			  if ((iInput & readMode)>0){
+			  if ((iInput & readModePullDown)>0 and (~iInput & readModePullUp)>0){
+//			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
 				  DEBUG_PRINTLN((byte)iInput, BIN);
 
@@ -321,7 +346,8 @@ void PCF8574::readBuffer(bool force){
 
 		byte byteRead = byteBuffered;
 
-		if ((readMode & byteBuffered)>0){
+		if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
+//		if ((readMode & byteBuffered)>0){
 			byteBuffered = ~readMode & byteBuffered;
 			DEBUG_PRINT("Buffer hight value readed set readed ");
 			DEBUG_PRINTLN(byteBuffered, BIN);
@@ -338,13 +364,17 @@ void PCF8574::readBuffer(bool force){
  * @return
  */
 uint8_t PCF8574::digitalRead(uint8_t pin){
-	uint8_t value = LOW;
+	uint8_t value = (bit(pin) & readModePullDown)?LOW:HIGH;
 	DEBUG_PRINT("Read pin ");
 	DEBUG_PRINTLN(pin);
 	// Check if pin already HIGH than read and prevent reread of i2c
-	if ((bit(pin) & byteBuffered)>0){
-		DEBUG_PRINTLN("Pin already up");
-		value = HIGH;
+	if (((bit(pin) & readModePullDown & byteBuffered)>0) and (bit(pin) & readModePullUp & ~byteBuffered) ){
+		DEBUG_PRINTLN("Pin already set");
+		if ((bit(pin) & readModePullDown & byteBuffered)>0) {
+			value = HIGH;
+		}else{
+			value = LOW;
+		}
 	 }else if ((/*(bit(pin) & byteBuffered)<=0 && */millis() > PCF8574::lastReadMillis+READ_ELAPSED_TIME) /*|| _usingInterrupt*/){
 		 DEBUG_PRINTLN("Read from buffer");
 		  _wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
@@ -354,7 +384,8 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
 			  DEBUG_PRINTLN("Data ready");
 			  byte iInput = _wire->read();// Read a byte
 
-			  if ((iInput & readMode)>0){
+			  if ((iInput & readModePullDown)>0 and (~iInput & readModePullUp)>0){
+//			  if ((iInput & readMode)>0){
 				  DEBUG_PRINT("Input ");
 				  DEBUG_PRINTLN((byte)iInput, BIN);
 
@@ -364,6 +395,8 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
 
 				  if ((bit(pin) & byteBuffered)>0){
 					  value = HIGH;
+				  }else{
+					  value = LOW;
 				  }
 			  }
 		  }
@@ -371,9 +404,13 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
 	DEBUG_PRINT("Buffer value ");
 	DEBUG_PRINTLN(byteBuffered, BIN);
 	// If HIGH set to low to read buffer only one time
-	if (value==HIGH){
+	if ((bit(pin) & readModePullDown) and value==HIGH){
 		byteBuffered = ~bit(pin) & byteBuffered;
 		DEBUG_PRINT("Buffer hight value readed set readed ");
+		DEBUG_PRINTLN(byteBuffered, BIN);
+	}else if ((bit(pin) & readModePullUp) and value==LOW){
+		byteBuffered = bit(pin) & byteBuffered;
+		DEBUG_PRINT("Buffer low value readed set readed ");
 		DEBUG_PRINTLN(byteBuffered, BIN);
 	}
 	DEBUG_PRINT("Return value ");
