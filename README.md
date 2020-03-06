@@ -2,6 +2,8 @@
 
 ### If you need more pins [here](https://www.mischianti.org/2019/07/22/pcf8575-i2c-16-bit-digital-i-o-expander/) you can find pcf8575 16bit version of the IC.
 
+### Version 2.0 
+
 Library to use i2c analog IC with arduino and esp8266. Can read and write digital value with only 2 wire (perfect for ESP-01).
 
 Tutorial: 
