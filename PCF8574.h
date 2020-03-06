@@ -45,6 +45,9 @@
 // Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
 // #define PCF8574_LOW_MEMORY
 
+// Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
+// #define PCF8574_LOW_LATENCY
+
 // Define where debug output will be printed.
 #define DEBUG_PRINTER Serial
 
@@ -57,7 +60,11 @@
 	#define DEBUG_PRINTLN(...) {}
 #endif
 
-#define READ_ELAPSED_TIME 10
+#ifdef PCF8574_LOW_LATENCY
+	#define READ_ELAPSED_TIME 1
+#else
+	#define READ_ELAPSED_TIME 10
+#endif
 
 //#define P0  	B00000001
 //#define P1  	B00000010
@@ -101,7 +108,7 @@ public:
 #endif
 
 	void begin();
-	void pinMode(uint8_t pin, uint8_t mode);
+	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
 	void readBuffer(bool force = true);
 	uint8_t digitalRead(uint8_t pin);
@@ -146,10 +153,12 @@ private:
 	void (*_interruptFunction)(){};
 
 	byte writeMode 			= 	B00000000;
+	byte writeModeUp		= 	B00000000;
 	byte readMode 			= 	B00000000;
 	byte readModePullUp 	= 	B00000000;
 	byte readModePullDown 	= 	B00000000;
 	byte byteBuffered 		= 	B00000000;
+	byte resetInitial		= 	B00000000;
 	unsigned long lastReadMillis = 0;
 
 	byte writeByteBuffered = B00000000;
