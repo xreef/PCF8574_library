@@ -191,7 +191,7 @@ void PCF8574::begin(){
 //		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
 		DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
 		::pinMode(_interruptPin, INPUT_PULLUP);
-		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), CHANGE );
+		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
 	}
 
 	// inizialize last read
@@ -268,12 +268,111 @@ void PCF8574::pinMode(uint8_t pin, uint8_t mode, uint8_t output_start){
 	}
 };
 
+void PCF8574::encoder(uint8_t pinA, uint8_t pinB){
+	PCF8574::pinMode(pinA, INPUT_PULLUP);
+	PCF8574::pinMode(pinB, INPUT_PULLUP);
+}
+
+byte getBit(byte n, byte position)
+{
+   return (n >> position) & 1;
+}
+
+
+//int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB){
+//	  bool changed = false;
+//
+//	  byte offset = 0;
+//
+//	  byte na = PCF8574::digitalRead(pinA);
+//	  byte nb = PCF8574::digitalRead(pinB);
+//
+//	  byte encoderPinALast = (encoderValues & bit(pinA));
+//	  byte encoderPinBLast = (encoderValues & bit(pinB));
+//
+//	  if ((encoderPinALast!=na || encoderPinBLast!=nb) && (encoderPinALast == LOW) && (na == HIGH)) {
+//		if (nb == LOW) {
+//			offset = - 1;
+//			changed = true;
+//		} else {
+//			offset = + 1;
+//			changed = true;
+//		}
+//	  }
+//
+//	  encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
+//	  encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+//
+//	  return offset;
+//}
+
+bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte newValB, byte validProgression){
+	bool findOldVal = false;
+	int posFinded = 0;
+	for (int pos = 0; pos<8; pos = pos + 2){
+		if ((oldValB == ((validProgression & bit(pos+1))>0?HIGH:LOW)) && (oldValA == ((validProgression & bit(pos+0))>0?HIGH:LOW)) ){
+			findOldVal = true;
+			posFinded = pos;
+		}
+	}
+	if (!findOldVal) return false;
+
+	posFinded = posFinded + 2;
+	if (posFinded>8) posFinded = 0;
+
+	return ((newValB == ((validProgression & bit(posFinded+1))>0?HIGH:LOW)) && (newValA == ((validProgression & bit(posFinded+0))>0?HIGH:LOW)) );
+}
+
+bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
+	  bool changed = false;
+
+	  byte na = PCF8574::digitalRead(pinA, true);
+	  byte nb = PCF8574::digitalRead(pinB, true);
+
+	  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
+	  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
+
+	  if ((encoderPinALast!=na || encoderPinBLast!=nb) && (encoderPinALast == LOW) && (na == HIGH)) {
+		  bool vCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCW);
+		  bool vCCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCCW);
+
+			if (nb == LOW) {
+	//			checkCW(encoderPinALast, encoderPinBLast, na, nb);
+				*encoderValue = *encoderValue - 1;
+				changed = true;
+			} else {
+				*encoderValue = *encoderValue + 1;
+				changed = true;
+			}
+//			if (nb == LOW && vCW) {
+//	//			checkCW(encoderPinALast, encoderPinBLast, na, nb);
+//				*encoderValue = *encoderValue - 1;
+//				changed = true;
+//			} else if (vCCW) {
+//				*encoderValue = *encoderValue + 1;
+//				changed = true;
+//			}
+
+	  }
+
+		encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
+		encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+
+		return changed;
+}
+
+int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB) {
+	volatile long encoderValue = 0;
+	PCF8574::readEncoderValue(pinA, pinB, &encoderValue);
+	return encoderValue;
+}
+
 /**
  * Read value from i2c and bufferize it
  * @param force
  */
 void PCF8574::readBuffer(bool force){
-	if (millis() > PCF8574::lastReadMillis+READ_ELAPSED_TIME || _usingInterrupt || force){
+	if (millis() > PCF8574::lastReadMillis+latency || _usingInterrupt || force){
 		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
 		if(_wire->available())   // If bytes are available to be recieved
@@ -371,7 +470,7 @@ void PCF8574::readBuffer(bool force){
  * @param pin
  * @return
  */
-uint8_t PCF8574::digitalRead(uint8_t pin){
+uint8_t PCF8574::digitalRead(uint8_t pin, bool forceReadNow){
 	uint8_t value = (bit(pin) & readModePullUp)?HIGH:LOW;
 	DEBUG_PRINT("Read pin ");
 	DEBUG_PRINT (pin);
@@ -392,7 +491,7 @@ uint8_t PCF8574::digitalRead(uint8_t pin){
 		  }else{
 			  value = LOW;
 		  }
-	 }else if ((/*(bit(pin) & byteBuffered)<=0 && */millis() > PCF8574::lastReadMillis+READ_ELAPSED_TIME) /*|| _usingInterrupt*/){
+	 }else if (forceReadNow || (millis() > PCF8574::lastReadMillis+latency)){
 		 DEBUG_PRINT(" ...Read from buffer... ");
 		  _wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		  lastReadMillis = millis();

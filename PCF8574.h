@@ -61,7 +61,7 @@
 #endif
 
 #ifdef PCF8574_LOW_LATENCY
-	#define READ_ELAPSED_TIME 1
+	#define READ_ELAPSED_TIME 0
 #else
 	#define READ_ELAPSED_TIME 10
 #endif
@@ -110,8 +110,10 @@ public:
 	void begin();
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
+	void encoder(uint8_t pinA, uint8_t pinB);
+
 	void readBuffer(bool force = true);
-	uint8_t digitalRead(uint8_t pin);
+	uint8_t digitalRead(uint8_t pin, bool forceReadNow = false);
 	#ifndef PCF8574_LOW_MEMORY
 		struct DigitalInput {
 			uint8_t p0;
@@ -130,6 +132,17 @@ public:
 		byte digitalReadAll(void);
 	#endif
 	void digitalWrite(uint8_t pin, uint8_t value);
+
+	bool readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue);
+	int8_t readEncoderValue(uint8_t pinA, uint8_t pinB);
+
+	int getLatency() const {
+		return latency;
+	}
+
+	void setLatency(int latency = READ_ELAPSED_TIME) {
+		this->latency = latency;
+	}
 
 private:
 	uint8_t _address;
@@ -163,6 +176,19 @@ private:
 
 	byte writeByteBuffered = B00000000;
 
+	byte encoderValues = B00000000;
+
+	uint8_t prevNextCode = 0;
+	uint16_t store=0;
+
+	int latency = READ_ELAPSED_TIME;
+
+	bool checkProgression(byte oldValA, byte newValA, byte oldValB, byte newValB, byte validProgression);
+
+//	byte validCW = B11100001;
+//	byte validCCW = B01001011;
+	byte validCW = B01001011;
+	byte validCCW = B11100001;
 };
 
 #endif
