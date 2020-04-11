@@ -151,6 +151,34 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 		_usingInterrupt = true;
 	};
 #endif
+	bool encoderPins[8];
+
+	void PCF8574::attachInterrupt(){
+		// If using interrupt set interrupt value to pin
+		if (_usingInterrupt){
+			for (int i = 0; i < 8;i++){
+				if (encoderPins[i]) PCF8574::digitalRead(i);
+			}
+//			PCF8574::digitalReadAll();
+//			(*_interruptFunction)();
+
+	//		DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
+	//		::pinMode(_interruptPin, INPUT_PULLUP);
+	//		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
+			DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
+			::pinMode(_interruptPin, INPUT_PULLUP);
+			::attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
+		}
+
+	}
+	void PCF8574::detachInterrupt(){
+		// If using interrupt set interrupt value to pin
+		if (_usingInterrupt){
+			::detachInterrupt(digitalPinToInterrupt(_interruptPin));
+			DEBUG_PRINTLN("Detach interrupt pin");
+		}
+
+	}
 
 /**
  * wake up i2c controller
@@ -184,15 +212,19 @@ void PCF8574::begin(){
 		_wire->endTransmission();
 	}
 
-	// If using interrupt set interrupt value to pin
-	if (_usingInterrupt){
+//	// If using interrupt set interrupt value to pin
+//	if (_usingInterrupt){
+////		DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
+////		::pinMode(_interruptPin, INPUT_PULLUP);
+////		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
 //		DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
 //		::pinMode(_interruptPin, INPUT_PULLUP);
-//		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
-		DEBUG_PRINTLN("Using interrupt pin (not all pin is interrupted)");
-		::pinMode(_interruptPin, INPUT_PULLUP);
-		attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
-	}
+//		::attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
+//	}
+
+
+
+	PCF8574::attachInterrupt();
 
 	// inizialize last read
 	lastReadMillis = millis();
@@ -268,9 +300,13 @@ void PCF8574::pinMode(uint8_t pin, uint8_t mode, uint8_t output_start){
 	}
 };
 
+
 void PCF8574::encoder(uint8_t pinA, uint8_t pinB){
 	PCF8574::pinMode(pinA, INPUT_PULLUP);
 	PCF8574::pinMode(pinB, INPUT_PULLUP);
+
+	encoderPins[pinA] = true;
+	encoderPins[pinB] = true;
 }
 
 byte getBit(byte n, byte position)
@@ -323,43 +359,79 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 	return ((newValB == ((validProgression & bit(posFinded+1))>0?HIGH:LOW)) && (newValA == ((validProgression & bit(posFinded+0))>0?HIGH:LOW)) );
 }
 
-bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
-	  bool changed = false;
+#ifdef BASIC_ENCODER_ALGORITHM
+	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
+		  bool changed = false;
 
-	  byte na = PCF8574::digitalRead(pinA, true);
-	  byte nb = PCF8574::digitalRead(pinB, true);
+		  byte na = PCF8574::digitalRead(pinA, true);
+		  byte nb = PCF8574::digitalRead(pinB, true);
 
-	  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
-	  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
+		  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
 
-	  if ((encoderPinALast!=na || encoderPinBLast!=nb) && (encoderPinALast == LOW) && (na == HIGH)) {
-		  bool vCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCW);
-		  bool vCCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCCW);
+		  if ((encoderPinALast!=na || encoderPinBLast!=nb) && (encoderPinALast == LOW) && (na == HIGH)) {
+			  bool vCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCW);
+			  bool vCCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCCW);
 
-			if (nb == LOW) {
-	//			checkCW(encoderPinALast, encoderPinBLast, na, nb);
-				*encoderValue = *encoderValue - 1;
-				changed = true;
-			} else {
-				*encoderValue = *encoderValue + 1;
-				changed = true;
-			}
-//			if (nb == LOW && vCW) {
-//	//			checkCW(encoderPinALast, encoderPinBLast, na, nb);
-//				*encoderValue = *encoderValue - 1;
-//				changed = true;
-//			} else if (vCCW) {
-//				*encoderValue = *encoderValue + 1;
-//				changed = true;
-//			}
+				if (nb == LOW) {
+					*encoderValue = *encoderValue - 1;
+					changed = true;
+				} else {
+					*encoderValue = *encoderValue + 1;
+					changed = true;
+				}
 
-	  }
+	//			if (nb == LOW && vCW) {
+	//	//			checkCW(encoderPinALast, encoderPinBLast, na, nb);
+	//				*encoderValue = *encoderValue - 1;
+	//				changed = true;
+	//			} else if (vCCW) {
+	//				*encoderValue = *encoderValue + 1;
+	//				changed = true;
+	//			}
 
-		encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
-		encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+		  }
 
-		return changed;
-}
+			encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
+			encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+
+			return changed;
+	}
+#endif
+#ifdef MISCHIANTI_ENCODER_ALGORITHM
+	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
+		  bool changed = false;
+
+		  byte na = PCF8574::digitalRead(pinA, true);
+		  byte nb = PCF8574::digitalRead(pinB, true);
+
+		  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
+
+		  if ((encoderPinALast!=na || encoderPinBLast!=nb) && ((encoderPinALast == LOW) || encoderPinALast==encoderPinBLast) && (na == HIGH)) {
+			  DEBUG_PRINT("TO --> ");
+			  DEBUG_PRINT(encoderPinALast);
+			  DEBUG_PRINT(encoderPinBLast);
+			  DEBUG_PRINT(" - ");
+			  DEBUG_PRINT(na);
+			  DEBUG_PRINT(nb);
+			  DEBUG_PRINTLN();
+
+				if (nb == LOW && nb!=na) {
+					*encoderValue = *encoderValue + 1;
+					changed = true;
+				} else if (nb==na && encoderPinALast==encoderPinBLast) {
+					*encoderValue = *encoderValue - 1;
+					changed = true;
+				}
+		  }
+
+			encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
+			encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+
+			return changed;
+	}
+#endif
 
 int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB) {
 	volatile long encoderValue = 0;

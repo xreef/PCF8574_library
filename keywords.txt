@@ -14,8 +14,16 @@ PCF8574	KEYWORD1
 
 begin	KEYWORD2
 pinMode	KEYWORD2
+encoder	KEYWORD2
 
-readBuffer	KEYWORD2
+attachInterrupt	KEYWORD2
+detachInterrupt	KEYWORD2
+
+readBuffer KEYWORD2
 digitalRead	KEYWORD2
 digitalReadAll	KEYWORD2
 digitalWrite	KEYWORD2
+
+readEncoderValue KEYWORD2
+getLatency KEYWORD2
+setLatency KEYWORD2
