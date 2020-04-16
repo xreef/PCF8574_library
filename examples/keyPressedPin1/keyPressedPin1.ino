@@ -24,6 +24,7 @@ void setup()
 void loop()
 {
 	uint8_t val = pcf8574.digitalRead(P1);
-	if (val==HIGH) Serial.println("KEY PRESSED");
+	if (val == HIGH)
+		Serial.println("KEY PRESSED");
 	delay(50);
 }
