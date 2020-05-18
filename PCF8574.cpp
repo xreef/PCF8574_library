@@ -491,6 +491,15 @@ void PCF8574::readBuffer(bool force){
 		if ((bit(6) & readMode)>0) digitalInput.p6 = ((byteBuffered & bit(6))>0)?HIGH:LOW;
 		if ((bit(7) & readMode)>0) digitalInput.p7 = ((byteBuffered & bit(7))>0)?HIGH:LOW;
 
+		if ((bit(0) & writeMode)>0) digitalInput.p0 = ((writeByteBuffered & bit(0))>0)?HIGH:LOW;
+		if ((bit(1) & writeMode)>0) digitalInput.p1 = ((writeByteBuffered & bit(1))>0)?HIGH:LOW;
+		if ((bit(2) & writeMode)>0) digitalInput.p2 = ((writeByteBuffered & bit(2))>0)?HIGH:LOW;
+		if ((bit(3) & writeMode)>0) digitalInput.p3 = ((writeByteBuffered & bit(3))>0)?HIGH:LOW;
+		if ((bit(4) & writeMode)>0) digitalInput.p4 = ((writeByteBuffered & bit(4))>0)?HIGH:LOW;
+		if ((bit(5) & writeMode)>0) digitalInput.p5 = ((writeByteBuffered & bit(5))>0)?HIGH:LOW;
+		if ((bit(6) & writeMode)>0) digitalInput.p6 = ((writeByteBuffered & bit(6))>0)?HIGH:LOW;
+		if ((bit(7) & writeMode)>0) digitalInput.p7 = ((writeByteBuffered & bit(7))>0)?HIGH:LOW;
+
 		//if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
 			byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
 			DEBUG_PRINT("Buffer hight value readed set readed ");
@@ -524,7 +533,7 @@ void PCF8574::readBuffer(bool force){
 		DEBUG_PRINT("Buffer value ");
 		DEBUG_PRINTLN(byteBuffered, BIN);
 
-		byte byteRead = byteBuffered;
+		byte byteRead = byteBuffered | writeByteBuffered;
 
 		//if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
 			byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
@@ -597,6 +606,8 @@ uint8_t PCF8574::digitalRead(uint8_t pin, bool forceReadNow){
 		byteBuffered = bit(pin) ^ byteBuffered;
 		DEBUG_PRINT(" ...Buffer low value readed set readed ");
 		DEBUG_PRINT(byteBuffered, BIN);
+	}else if(bit(pin) & writeByteBuffered){
+		value = HIGH;
 	}
 	DEBUG_PRINT(" ...Return value ");
 	DEBUG_PRINTLN(value);
