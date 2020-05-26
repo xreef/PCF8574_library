@@ -200,12 +200,18 @@ void PCF8574::begin(){
 
 
 		DEBUG_PRINT("resetInitial pin ");
+#ifdef PCF8574_SOFT_INITIALIZATION
 		resetInitial = writeModeUp | readModePullUp;
+#else
+		resetInitial = writeModeUp | readMode;
+#endif
 		DEBUG_PRINTLN( resetInitial, BIN);
 
+		_wire->beginTransmission(_address);
 		_wire->write(resetInitial);
 
-		byteBuffered = resetInitial;
+		initialBuffer = writeModeUp | readModePullUp;
+		byteBuffered = initialBuffer;
 		writeByteBuffered = writeModeUp;
 
 		DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
@@ -501,7 +507,11 @@ void PCF8574::readBuffer(bool force){
 		if ((bit(7) & writeMode)>0) digitalInput.p7 = ((writeByteBuffered & bit(7))>0)?HIGH:LOW;
 
 		//if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
-			byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
+
+//		byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
+
+		byteBuffered = (initialBuffer & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
+
 			DEBUG_PRINT("Buffer hight value readed set readed ");
 			DEBUG_PRINTLN(byteBuffered, BIN);
 		//}
@@ -536,7 +546,8 @@ void PCF8574::readBuffer(bool force){
 		byte byteRead = byteBuffered | writeByteBuffered;
 
 		//if ((byteBuffered & readModePullDown)>0 and (~byteBuffered & readModePullUp)>0){
-			byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
+//			byteBuffered = (resetInitial & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
+		byteBuffered = (initialBuffer & readMode) | (byteBuffered  & ~readMode); //~readMode & byteBuffered;
 			DEBUG_PRINT("Buffer hight value readed set readed ");
 			DEBUG_PRINTLN(byteBuffered, BIN);
 		//}
@@ -565,7 +576,7 @@ uint8_t PCF8574::digitalRead(uint8_t pin, bool forceReadNow){
 //	DEBUG_PRINTLN(byteBuffered, BIN);
 
 
-	if (((bit(pin) & (readModePullDown & byteBuffered))>0) or (bit(pin) & (readModePullUp & ~byteBuffered))>0 ){
+	if ((((bit(pin) & (readModePullDown & byteBuffered))>0) or (bit(pin) & (readModePullUp & ~byteBuffered))>0 )){
 		DEBUG_PRINTLN(" ...Pin already set");
 		  if ((bit(pin) & byteBuffered)>0){
 			  value = HIGH;
@@ -645,10 +656,18 @@ void PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 
 	// writeByteBuffered = writeByteBuffered & (~writeMode & byteBuffered);
 	byteBuffered = (writeByteBuffered & writeMode) | (resetInitial & readMode);
+
+	// byteBuffered = (writeByteBuffered & writeMode) | (byteBuffered & readMode);
 	DEBUG_PRINT(" byteBuffered ");
 	DEBUG_PRINTLN(byteBuffered, BIN);
 
+	DEBUG_PRINT("Going to write data ");
+	DEBUG_PRINTLN(writeByteBuffered, BIN);
+
 	_wire->write(byteBuffered);
+
+	byteBuffered = (writeByteBuffered & writeMode) | (initialBuffer & readMode);
+
 //	byteBuffered = (writeByteBuffered & writeMode) & (byteBuffered & readMode);
 	DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
 
