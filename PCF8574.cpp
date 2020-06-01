@@ -183,7 +183,8 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 /**
  * wake up i2c controller
  */
-void PCF8574::begin(){
+bool PCF8574::begin(){
+	this->transmissionStatus = 4;
 	#if !defined(__AVR) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
 		_wire->begin(_sda, _scl);
 	#else
@@ -215,7 +216,7 @@ void PCF8574::begin(){
 		writeByteBuffered = writeModeUp;
 
 		DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
-		_wire->endTransmission();
+		this->transmissionStatus = _wire->endTransmission();
 	}
 
 //	// If using interrupt set interrupt value to pin
@@ -234,6 +235,8 @@ void PCF8574::begin(){
 
 	// inizialize last read
 	lastReadMillis = millis();
+
+	return this->isLastTransmissionSuccess();
 }
 
 /**
@@ -630,7 +633,7 @@ uint8_t PCF8574::digitalRead(uint8_t pin, bool forceReadNow){
  * @param pin
  * @param value
  */
-void PCF8574::digitalWrite(uint8_t pin, uint8_t value){
+bool PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 	DEBUG_PRINTLN("Begin trasmission");
 	_wire->beginTransmission(_address);     //Begin the transmission to PCF8574
 	DEBUG_PRINT("Value ");
@@ -671,7 +674,9 @@ void PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 //	byteBuffered = (writeByteBuffered & writeMode) & (byteBuffered & readMode);
 	DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
 
-	_wire->endTransmission();
+	this->transmissionStatus = _wire->endTransmission();
+
+	return this->isLastTransmissionSuccess();
 };
 
 

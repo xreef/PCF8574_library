@@ -120,7 +120,7 @@ public:
 	PCF8574(TwoWire *pWire, uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)());
 #endif
 
-	void begin();
+	bool begin();
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
 	void encoder(uint8_t pinA, uint8_t pinB);
@@ -147,7 +147,7 @@ public:
 	#else
 		byte digitalReadAll(void);
 	#endif
-	void digitalWrite(uint8_t pin, uint8_t value);
+	bool digitalWrite(uint8_t pin, uint8_t value);
 
 	bool readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue);
 	int8_t readEncoderValue(uint8_t pinA, uint8_t pinB);
@@ -160,6 +160,13 @@ public:
 		this->latency = latency;
 	}
 
+	uint8_t getTransmissionStatusCode() const {
+		return transmissionStatus;
+	}
+
+	bool isLastTransmissionSuccess(){
+		return transmissionStatus==0;
+	}
 private:
 	uint8_t _address;
 
@@ -207,6 +214,7 @@ private:
 	byte validCW = B01001011;
 	byte validCCW = B11100001;
 
+	uint8_t transmissionStatus = 0;
 };
 
 #endif
