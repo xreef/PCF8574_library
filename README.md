@@ -1,10 +1,10 @@
 <div>
-<a href="https://www.mischianti.org/forums/forum/english-support-forum/mischiantis-libraries/pcf8574-i2c-digital-i-o-expander/"><img
+<a href="https://www.mischianti.org/forums/forum/mischiantis-libraries/pcf8574-i2c-digital-i-o-expander/"><img
   src="https://github.com/xreef/LoRa_E32_Series_Library/raw/master/resources/buttonSupportForumEnglish.png" alt="Support forum pcf8574 English"
    align="right"></a>
 </div>
 <div>
-<a href="https://www.mischianti.org/forums/forum/forum-di-supporto-in-italiano/le-librerie-di-mischianti/pcf8574-expander-digitale-i-o-i2c/"><img
+<a href="https://www.mischianti.org/it/forums/forum/le-librerie-di-mischianti/pcf8574-expander-digitale-i-o-i2c/"><img
   src="https://github.com/xreef/LoRa_E32_Series_Library/raw/master/resources/buttonSupportForumItaliano.png" alt="Forum supporto pcf8574 italiano"
   align="right"></a>
 </div>
