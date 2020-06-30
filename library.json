@@ -1,0 +1,19 @@
+{
+  "name": "PCF8574 library",
+  "keywords": "i2c, pcf8574, io, sensor",
+  "description": "Use i2c digital expander with Arduino and ESP8266. Can read write digital values with only 2 wire (perfect for ESP-01).",
+  "authors": [
+    {
+      "name": "Renzo Mischianti",
+      "email": "renzo.mischianti@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xreef/PCF8574_library.git"
+  },
+  "version": "2.2.0",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
