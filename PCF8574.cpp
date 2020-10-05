@@ -697,14 +697,14 @@ bool PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 	}
 	bool PCF8574::digitalWriteAll(PCF8574::DigitalInput digitalInput){
 
-		setVal(0, digitalInput.p0);
-		setVal(1, digitalInput.p1);
-		setVal(2, digitalInput.p2);
-		setVal(3, digitalInput.p3);
-		setVal(4, digitalInput.p4);
-		setVal(5, digitalInput.p5);
-		setVal(6, digitalInput.p6);
-		setVal(7, digitalInput.p7);
+		setVal(P0, digitalInput.p0);
+		setVal(P1, digitalInput.p1);
+		setVal(P2, digitalInput.p2);
+		setVal(P3, digitalInput.p3);
+		setVal(P4, digitalInput.p4);
+		setVal(P5, digitalInput.p5);
+		setVal(P6, digitalInput.p6);
+		setVal(P7, digitalInput.p7);
 
 		return digitalWriteAllBytes(writeByteBuffered);
 	}

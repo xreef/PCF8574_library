@@ -42,13 +42,20 @@ void keyPressedOnPCF8574(){
 void setup()
 {
   Serial.begin(9600);
+  delay(1000);
+
   pinMode(ESP8266_INTERRUPTED_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ESP8266_INTERRUPTED_PIN), keyPressedOnPCF8574, FALLING);
 
   for(int i=0;i<8;i++) {
     pcf8574.pinMode(i, INPUT);
   }
-  pcf8574.begin();
+	Serial.print("Init pcf8574...");
+	if (pcf8574.begin()){
+		Serial.println("OK");
+	}else{
+		Serial.println("KO");
+	}
 }
 
 void loop()

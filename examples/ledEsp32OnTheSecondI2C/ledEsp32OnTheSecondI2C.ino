@@ -46,12 +46,19 @@ void setup()
   Serial.begin(112560);
 
   I2Cone.begin(16,17,400000); // SDA pin 16, SCL pin 17, 400kHz frequency
+  delay(1000);
 
   // Set pinMode to OUTPUT
   for(int i=0;i<8;i++) {
     pcf8574.pinMode(i, OUTPUT);
   }
-  pcf8574.begin();
+
+	Serial.print("Init pcf8574...");
+	if (pcf8574.begin()){
+		Serial.println("OK");
+	}else{
+		Serial.println("KO");
+	}
 }
 
 void loop()
