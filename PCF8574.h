@@ -190,10 +190,8 @@ private:
 	#  endif
 	#endif
 
-	uint8_t _sda = DEFAULT_SDA
-	;
-	uint8_t _scl = DEFAULT_SCL
-	;
+	uint8_t _sda = DEFAULT_SDA;
+	uint8_t _scl = DEFAULT_SCL;
 
 	TwoWire *_wire;
 
