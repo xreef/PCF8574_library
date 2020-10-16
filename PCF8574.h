@@ -43,9 +43,6 @@
 #include "WProgram.h"
 #endif
 
-#define DEFAULT_SDA SDA;
-#define DEFAULT_SCL SCL;
-
 // Uncomment to enable printing out nice debug messages.
 // #define PCF8574_DEBUG
 
@@ -170,17 +167,31 @@ public:
 private:
 	uint8_t _address;
 
-	#ifdef __STM32F1__
-	#ifndef SDA
-	#define DEFAULT_SDA PB7
-	#define DEFAULT_SCL PB6
+	#if !defined(DEFAULT_SDA)
+	#  if defined(__STM32F1__)
+	#    define DEFAULT_SDA PB7
+	#  elif defined(ESP8266)
+	#    define DEFAULT_SDA 4
+	#  elif defined(SDA)
+	#    define DEFAULT_SDA SDA
+	#  else
+	#    error "Error define DEFAULT_SDA, SDA not declared"
+	#  endif
 	#endif
+	#if !defined(DEFAULT_SCL)
+	#  if defined(__STM32F1__)
+	#    define DEFAULT_SCL PB6
+	#  elif defined(ESP8266)
+	#    define DEFAULT_SCL 5
+	#  elif defined(SDA)
+	#    define DEFAULT_SCL SCL
+	#  else
+	#    error "Error define DEFAULT_SCL, SCL not declared"
+	#  endif
 	#endif
 
-	uint8_t _sda = DEFAULT_SDA
-	;
-	uint8_t _scl = DEFAULT_SCL
-	;
+	uint8_t _sda = DEFAULT_SDA;
+	uint8_t _scl = DEFAULT_SCL;
 
 	TwoWire *_wire;
 
@@ -218,3 +229,4 @@ private:
 };
 
 #endif
+
