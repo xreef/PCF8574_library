@@ -71,7 +71,7 @@ void loop()
 	}
 
 	  if (millis() - lastSendTime > interval) {
-			Serial.print("WRITE VALUE FROM P4 TO P7 ");
+			Serial.print("WRITE ALL VALUE FROM P4 TO P7 ");
 			Serial.println(startVal);
 
 //			pcf8574.digitalWrite(P7, startVal);
