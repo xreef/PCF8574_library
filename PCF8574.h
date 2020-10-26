@@ -181,7 +181,7 @@ private:
 	#  elif defined(SDA)
 	#    define DEFAULT_SDA SDA
 	#  else
-	#    error "Error define DEFAULT_SDA, SDA not declared"
+	#    error "Error define DEFAULT_SDA, SDA not declared, if you have this error contact the mantainer"
 	#  endif
 	#endif
 	#if !defined(DEFAULT_SCL)
@@ -192,7 +192,7 @@ private:
 	#  elif defined(SDA)
 	#    define DEFAULT_SCL SCL
 	#  else
-	#    error "Error define DEFAULT_SCL, SCL not declared"
+	#    error "Error define DEFAULT_SCL, SCL not declared, if you have this error contact the mantainer"
 	#  endif
 	#endif
 
