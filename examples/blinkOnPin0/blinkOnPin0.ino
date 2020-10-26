@@ -14,11 +14,18 @@ PCF8574 pcf8574(0x39);
 void setup()
 {
 	Serial.begin(115200);
+	delay(1000);
 
 	// Set pinMode to OUTPUT
 	pcf8574.pinMode(P0, OUTPUT);
 	pcf8574.pinMode(P1, INPUT);
-	pcf8574.begin();
+
+	Serial.print("Init pcf8574...");
+	if (pcf8574.begin()){
+		Serial.println("OK");
+	}else{
+		Serial.println("KO");
+	}
 }
 
 void loop()

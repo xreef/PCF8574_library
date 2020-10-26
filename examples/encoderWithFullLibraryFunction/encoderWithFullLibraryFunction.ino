@@ -44,7 +44,12 @@ void setup()
 	pcf8574.pinMode(P2, INPUT);
 
 	// Start library
-	pcf8574.begin();
+	Serial.print("Init pcf8574...");
+	if (pcf8574.begin()){
+		Serial.println("OK");
+	}else{
+		Serial.println("KO");
+	}
 
 }
 

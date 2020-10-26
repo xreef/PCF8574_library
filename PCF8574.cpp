@@ -679,4 +679,65 @@ bool PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 	return this->isLastTransmissionSuccess();
 };
 
+#ifndef PCF8574_LOW_MEMORY
+	/**
+	 * Read value of all INPUT pin
+	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * @return
+	 */
+	void PCF8574::setVal(uint8_t pin, uint8_t value){
+		if (value==HIGH){
+			writeByteBuffered = writeByteBuffered | bit(pin);
+			byteBuffered  = writeByteBuffered | bit(pin);
+		}else{
+			writeByteBuffered = writeByteBuffered & ~bit(pin);
+			byteBuffered  = writeByteBuffered & ~bit(pin);
+		}
 
+	}
+	bool PCF8574::digitalWriteAll(PCF8574::DigitalInput digitalInput){
+
+		setVal(P0, digitalInput.p0);
+		setVal(P1, digitalInput.p1);
+		setVal(P2, digitalInput.p2);
+		setVal(P3, digitalInput.p3);
+		setVal(P4, digitalInput.p4);
+		setVal(P5, digitalInput.p5);
+		setVal(P6, digitalInput.p6);
+		setVal(P7, digitalInput.p7);
+
+		return digitalWriteAllBytes(writeByteBuffered);
+	}
+#else
+	bool PCF8574::digitalWriteAll(byte digitalInput){
+		return digitalWriteAllBytes(digitalInput);
+	}
+#endif
+
+
+bool PCF8574::digitalWriteAllBytes(byte allpins){
+	_wire->beginTransmission(_address);     //Begin the transmission to PCF8574
+
+	// writeByteBuffered = writeByteBuffered & (~writeMode & byteBuffered);
+	writeByteBuffered = allpins;
+	byteBuffered = (writeByteBuffered & writeMode) | (resetInitial & readMode);
+
+	// byteBuffered = (writeByteBuffered & writeMode) | (byteBuffered & readMode);
+	DEBUG_PRINT(" byteBuffered ");
+	DEBUG_PRINTLN(byteBuffered, BIN);
+
+	DEBUG_PRINT("Going to write data ");
+	DEBUG_PRINTLN(writeByteBuffered, BIN);
+
+	_wire->write(byteBuffered);
+
+	byteBuffered = (writeByteBuffered & writeMode) | (initialBuffer & readMode);
+
+//	byteBuffered = (writeByteBuffered & writeMode) & (byteBuffered & readMode);
+	DEBUG_PRINTLN("Start end trasmission if stop here check pullup resistor.");
+
+	this->transmissionStatus = _wire->endTransmission();
+
+	return this->isLastTransmissionSuccess();
+
+}

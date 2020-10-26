@@ -144,8 +144,11 @@ public:
 
 
 		DigitalInput digitalReadAll(void);
+
+		bool digitalWriteAll(PCF8574::DigitalInput digitalInput);
 	#else
 		byte digitalReadAll(void);
+		bool digitalWriteAll(byte digitalInput);
 	#endif
 	bool digitalWrite(uint8_t pin, uint8_t value);
 
@@ -229,6 +232,9 @@ private:
 	byte validCCW = B11100001;
 
 	uint8_t transmissionStatus = 0;
+
+	void setVal(uint8_t pin, uint8_t value);
+	bool digitalWriteAllBytes(byte allpins);
 };
 
 #endif

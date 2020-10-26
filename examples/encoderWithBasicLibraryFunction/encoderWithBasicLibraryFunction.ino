@@ -49,7 +49,12 @@ void setup()
 	  pcf8574.setLatency(0);
 
 	  // Start library
-	  pcf8574.begin();
+		Serial.print("Init pcf8574...");
+		if (pcf8574.begin()){
+			Serial.println("OK");
+		}else{
+			Serial.println("KO");
+		}
 }
 
 bool changed = false;
