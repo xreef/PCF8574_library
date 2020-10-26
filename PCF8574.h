@@ -43,6 +43,9 @@
 #include "WProgram.h"
 #endif
 
+#define DEFAULT_SDA SDA;
+#define DEFAULT_SCL SCL;
+
 // Uncomment to enable printing out nice debug messages.
 // #define PCF8574_DEBUG
 
