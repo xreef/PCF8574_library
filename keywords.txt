@@ -23,6 +23,7 @@ readBuffer KEYWORD2
 digitalRead	KEYWORD2
 digitalReadAll	KEYWORD2
 digitalWrite	KEYWORD2
+digitalWriteAll KEYWORD2
 
 readEncoderValue KEYWORD2
 getLatency KEYWORD2
