@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.2.0
+ * VERSION: 2.2.2
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -47,7 +47,7 @@
 #define DEFAULT_SCL SCL;
 
 // Uncomment to enable printing out nice debug messages.
-// #define PCF8574_DEBUG
+ // #define PCF8574_DEBUG
 
 // Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
 // #define PCF8574_LOW_MEMORY
@@ -58,8 +58,11 @@
 //#define PCF8574_SOFT_INITIALIZATION
 
 // Select an algorithm to manage encoder progression
-//#define BASIC_ENCODER_ALGORITHM
-#define MISCHIANTI_ENCODER_ALGORITHM
+ #define BASIC_ENCODER_ALGORITHM
+// #define MISCHIANTI_ENCODER_ALGORITHM
+// #define SEQUENCE_ENCODER_ALGORITHM_REDUCED
+// #define SEQUENCE_ENCODER_ALGORITHM
+// #define POKI_ENCODER_ALGORITHM
 
 // Define where debug output will be printed.
 #define DEBUG_PRINTER Serial
@@ -152,8 +155,30 @@ public:
 	#endif
 	bool digitalWrite(uint8_t pin, uint8_t value);
 
-	bool readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue);
+#ifdef MISCHIANTI_ENCODER_ALGORITHM
+	bool readEncoderValueMischianti(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
+	int8_t readEncoderValueMischianti(uint8_t pinA, uint8_t pinB);
+#endif
+#ifdef POKI_ENCODER_ALGORITHM
+	bool readEncoderValuePoki(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
+	int8_t readEncoderValuePoki(uint8_t pinA, uint8_t pinB);
+#endif
+
+//	bool readEncoderValueEvolved(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
+//	int8_t readEncoderValueEvolved(uint8_t pinA, uint8_t pinB);
+
+#ifdef SEQUENCE_ENCODER_ALGORITHM
+	bool readEncoderValueSequence(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
+	int8_t readEncoderValueSequence(uint8_t pinA, uint8_t pinB);
+#endif
+#ifdef SEQUENCE_ENCODER_ALGORITHM_REDUCED
+	bool readEncoderValueSequenceReduced(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
+	int8_t readEncoderValueSequenceReduced(uint8_t pinA, uint8_t pinB);
+#endif
+#ifdef BASIC_ENCODER_ALGORITHM
+	bool readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation = false);
 	int8_t readEncoderValue(uint8_t pinA, uint8_t pinB);
+#endif
 
 	int getLatency() const {
 		return latency;
@@ -217,7 +242,7 @@ private:
 
 	byte writeByteBuffered = B00000000;
 
-	byte encoderValues = B00000000;
+	volatile byte encoderValues = B00000000;
 
 	uint8_t prevNextCode = 0;
 	uint16_t store=0;

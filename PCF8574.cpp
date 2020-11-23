@@ -369,24 +369,35 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 }
 
 #ifdef BASIC_ENCODER_ALGORITHM
-	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
+	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+		PCF8574::detachInterrupt();
+
 		  bool changed = false;
 
 		  byte na = PCF8574::digitalRead(pinA, true);
 		  byte nb = PCF8574::digitalRead(pinB, true);
 
-		  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
-		  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
+		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
+
+		  DEBUG_PRINT(pinA);
+		  DEBUG_PRINT(" TO --> ");
+		  DEBUG_PRINT(encoderPinALast);
+		  DEBUG_PRINT(encoderPinBLast);
+		  DEBUG_PRINT(" - ");
+		  DEBUG_PRINT(na);
+		  DEBUG_PRINT(nb);
+		  DEBUG_PRINTLN();
 
 		  if ((encoderPinALast!=na || encoderPinBLast!=nb) && (encoderPinALast == LOW) && (na == HIGH)) {
-			  bool vCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCW);
-			  bool vCCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCCW);
+//			  bool vCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCW);
+//			  bool vCCW = checkProgression(encoderPinALast, encoderPinBLast, na, nb, validCCW);
 
 				if (nb == LOW) {
-					*encoderValue = *encoderValue - 1;
+					*encoderValue = *encoderValue + (!reverseRotation?+1:-1);
 					changed = true;
 				} else {
-					*encoderValue = *encoderValue + 1;
+					*encoderValue = *encoderValue + (!reverseRotation?-1:+1);
 					changed = true;
 				}
 
@@ -401,21 +412,166 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 
 		  }
 
-			encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
-			encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
+		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+		  PCF8574::attachInterrupt();
 
 			return changed;
 	}
+	int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB) {
+		volatile long encoderValue = 0;
+		PCF8574::readEncoderValue(pinA, pinB, &encoderValue);
+		return encoderValue;
+	}
+
+#endif
+
+#ifdef SEQUENCE_ENCODER_ALGORITHM
+	bool PCF8574::readEncoderValueSequence(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+
+		PCF8574::detachInterrupt();
+		  bool changed = false;
+
+		  delay(100);
+		  byte na = PCF8574::digitalRead(pinA, true);
+		  byte nb = PCF8574::digitalRead(pinB, true);
+
+		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
+
+		  DEBUG_PRINT(pinA);
+		  DEBUG_PRINT(" TO --> ");
+		  DEBUG_PRINT(encoderPinALast);
+		  DEBUG_PRINT(encoderPinBLast);
+		  DEBUG_PRINT(" - ");
+		  DEBUG_PRINT(na);
+		  DEBUG_PRINT(nb);
+		  DEBUG_PRINT(" -- ");
+
+		  int encoded = (na << 1) | nb; //converting the 2 pin value to single number
+		  int lastEncoded = (encoderPinALast << 1) | encoderPinBLast;
+		  int sum  = (lastEncoded << 2) | encoded; //adding it to the previous encoded value
+
+		  DEBUG_PRINT("sum - ");
+		  DEBUG_PRINT(sum, BIN);
+
+		  DEBUG_PRINT(" enc - ");
+		  DEBUG_PRINT( *encoderValue);
+
+			  if(
+					  sum == 0b1101
+					   || sum == 0b0100
+					  || sum == 0b0010
+					   || sum == 0b1011
+					  ){
+	//			  encoderValue ++;
+				  *encoderValue = *encoderValue + (!reverseRotation?+1:-1);
+				  changed = true;
+			  }
+			  if(
+					  sum == 0b1110
+					   || sum == 0b0111
+					  || sum == 0b0001
+					   || sum == 0b1000
+					) {
+				  *encoderValue = *encoderValue + (!reverseRotation?-1:+1);
+				  changed = true;
+	//			  encoderValue --;
+			  }
+
+		  DEBUG_PRINT(" enc next - ");
+		  DEBUG_PRINTLN( *encoderValue);
+
+		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
+		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+		  PCF8574::attachInterrupt();
+			return changed;
+	}
+	int8_t PCF8574::readEncoderValueSequence(uint8_t pinA, uint8_t pinB) {
+		volatile long encoderValue = 0;
+		PCF8574::readEncoderValueSequence(pinA, pinB, &encoderValue);
+		return encoderValue;
+	}
+
+#endif
+#ifdef SEQUENCE_ENCODER_ALGORITHM_REDUCED
+	bool PCF8574::readEncoderValueSequenceReduced(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+
+		PCF8574::detachInterrupt();
+		  bool changed = false;
+
+		  delay(100);
+		  byte na = PCF8574::digitalRead(pinA, true);
+		  byte nb = PCF8574::digitalRead(pinB, true);
+
+		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
+
+		  DEBUG_PRINT(pinA);
+		  DEBUG_PRINT(" TO --> ");
+		  DEBUG_PRINT(encoderPinALast);
+		  DEBUG_PRINT(encoderPinBLast);
+		  DEBUG_PRINT(" - ");
+		  DEBUG_PRINT(na);
+		  DEBUG_PRINT(nb);
+		  DEBUG_PRINT(" -- ");
+
+		  int encoded = (na << 1) | nb; //converting the 2 pin value to single number
+		  int lastEncoded = (encoderPinALast << 1) | encoderPinBLast;
+		  int sum  = (lastEncoded << 2) | encoded; //adding it to the previous encoded value
+
+		  DEBUG_PRINT("sum - ");
+		  DEBUG_PRINT(sum, BIN);
+
+		  DEBUG_PRINT(" enc - ");
+		  DEBUG_PRINT( *encoderValue);
+
+			  if(
+					  sum == 0b1101
+					  // || sum == 0b0100
+					  || sum == 0b0010
+					  // || sum == 0b1011
+					  ){
+	//			  encoderValue ++;
+				  *encoderValue = *encoderValue + (!reverseRotation?+1:-1);
+				  changed = true;
+			  }
+			  if(
+					  sum == 0b1110
+					  // || sum == 0b0111
+					  || sum == 0b0001
+					  // || sum == 0b1000
+					) {
+				  *encoderValue = *encoderValue + (!reverseRotation?-1:+1);
+				  changed = true;
+	//			  encoderValue --;
+			  }
+
+		  DEBUG_PRINT(" enc next - ");
+		  DEBUG_PRINTLN( *encoderValue);
+
+		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
+		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+		  PCF8574::attachInterrupt();
+			return changed;
+	}
+	int8_t PCF8574::readEncoderValueSequenceReduced(uint8_t pinA, uint8_t pinB) {
+		volatile long encoderValue = 0;
+		PCF8574::readEncoderValueSequenceReduced(pinA, pinB, &encoderValue);
+		return encoderValue;
+	}
+
 #endif
 #ifdef MISCHIANTI_ENCODER_ALGORITHM
-	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue){
+	bool PCF8574::readEncoderValueMischianti(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+		PCF8574::detachInterrupt();
 		  bool changed = false;
 
 		  byte na = PCF8574::digitalRead(pinA, true);
 		  byte nb = PCF8574::digitalRead(pinB, true);
 
-		  byte encoderPinALast = (encoderValues & bit(pinA))>0?HIGH:LOW;
-		  byte encoderPinBLast = (encoderValues & bit(pinB))>0?HIGH:LOW;
+		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
 
 		  if ((encoderPinALast!=na || encoderPinBLast!=nb) && ((encoderPinALast == LOW) || encoderPinALast==encoderPinBLast) && (na == HIGH)) {
 			  DEBUG_PRINT("TO --> ");
@@ -427,26 +583,156 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 			  DEBUG_PRINTLN();
 
 				if (nb == LOW && nb!=na) {
-					*encoderValue = *encoderValue + 1;
+					*encoderValue = *encoderValue + (!reverseRotation?+1:-1);
 					changed = true;
 				} else if (nb==na && encoderPinALast==encoderPinBLast) {
-					*encoderValue = *encoderValue - 1;
+					*encoderValue = *encoderValue + (!reverseRotation?-1:+1);
+					changed = true;
+				}
+		  }
+//		  encoderValues = encoderValues & (~(bit(pinA) | bit(pinB)));
+//		  if (na == HIGH){
+//			  encoderValues = encoderValues | bit(pinA);
+//		  }
+//		  if (nb == HIGH){
+//			  encoderValues = encoderValues | bit(pinA);
+//		  }
+
+		  if (encoderPinALast!=na || encoderPinBLast!=nb){
+		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
+		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+		  }
+
+		  PCF8574::attachInterrupt();
+			return changed;
+	}
+	int8_t PCF8574::readEncoderValueMischianti(uint8_t pinA, uint8_t pinB) {
+		volatile long encoderValue = 0;
+		PCF8574::readEncoderValueMischianti(pinA, pinB, &encoderValue);
+		return encoderValue;
+	}
+
+#endif
+//#ifdef MISCHIANTI_ENCODER_ALGORITHM_EVOLVED
+//	bool PCF8574::readEncoderValueEvolved(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+//		PCF8574::detachInterrupt();
+//		  bool changed = false;
+//
+//		  byte na = PCF8574::digitalRead(pinA, true);
+//		  byte nb = PCF8574::digitalRead(pinB, true);
+//
+//		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+//		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
+//
+////		  Serial.print(pinA);
+////		  Serial.print(" TO --> ");
+////		  Serial.print(encoderPinALast);
+////		  Serial.print(encoderPinBLast);
+////		  Serial.print(" - ");
+////		  Serial.print(na);
+////		  Serial.print(nb);
+//
+//		  if (
+//
+//		  ((encoderPinALast!=na || encoderPinBLast!=nb) && ((encoderPinALast == LOW) || encoderPinALast==encoderPinBLast) && (na == HIGH))
+//		  || ((encoderPinALast!=na || encoderPinBLast!=nb) && ((encoderPinALast == HIGH) || encoderPinALast==encoderPinBLast) && (na == LOW))
+//			){
+//			  DEBUG_PRINT("TO --> ");
+//			  DEBUG_PRINT(encoderPinALast);
+//			  DEBUG_PRINT(encoderPinBLast);
+//			  DEBUG_PRINT(" - ");
+//			  DEBUG_PRINT(na);
+//			  DEBUG_PRINT(nb);
+//			  DEBUG_PRINTLN();
+//
+////			  Serial.print (" <------ ");
+//
+//				if (nb == LOW && nb!=na) {
+//					*encoderValue = *encoderValue + (!reverseRotation?+1:-1);
+//					changed = true;
+//				} else if (nb==na && encoderPinALast==encoderPinBLast) {
+//					*encoderValue = *encoderValue + (!reverseRotation?-1:+1);
+//					changed = true;
+//				}
+//		  }
+////		  Serial.println();
+////		  encoderValues = encoderValues & (~(bit(pinA) | bit(pinB)));
+////		  if (na == HIGH){
+////			  encoderValues = encoderValues | bit(pinA);
+////		  }
+////		  if (nb == HIGH){
+////			  encoderValues = encoderValues | bit(pinA);
+////		  }
+//
+//		  if (encoderPinALast!=na || encoderPinBLast!=nb){
+//		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
+//		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+//		  }
+//
+//		  PCF8574::attachInterrupt();
+//			return changed;
+//	}
+//	int8_t PCF8574::readEncoderValueEvolved(uint8_t pinA, uint8_t pinB) {
+//		volatile long encoderValue = 0;
+//		PCF8574::readEncoderValueEvolved(pinA, pinB, &encoderValue);
+//		return encoderValue;
+//	}
+//
+//#endif
+
+#ifdef POKI_ENCODER_ALGORITHM
+	bool PCF8574::readEncoderValuePoki(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+		  PCF8574::detachInterrupt();
+
+		  bool changed = false;
+
+		  byte na = PCF8574::digitalRead(pinA, true);
+		  byte nb = PCF8574::digitalRead(pinB, true);
+
+		  byte encoderPinALast = (this->encoderValues & bit(pinA))>0?HIGH:LOW;
+		  byte encoderPinBLast = (this->encoderValues & bit(pinB))>0?HIGH:LOW;
+
+		  DEBUG_PRINT("TO --> ");
+		  DEBUG_PRINT(encoderPinALast);
+		  DEBUG_PRINT(encoderPinBLast);
+		  DEBUG_PRINT(" - ");
+		  DEBUG_PRINT(na);
+		  DEBUG_PRINT(nb);
+		  DEBUG_PRINTLN();
+
+		  if ((encoderPinALast!=na || encoderPinBLast!=nb) && ((encoderPinALast == LOW) || encoderPinALast==encoderPinBLast) && (na == HIGH)) {
+			  DEBUG_PRINT("TO --> ");
+			  DEBUG_PRINT(encoderPinALast);
+			  DEBUG_PRINT(encoderPinBLast);
+			  DEBUG_PRINT(" - ");
+			  DEBUG_PRINT(na);
+			  DEBUG_PRINT(nb);
+			  DEBUG_PRINTLN();
+
+			  if (na && !nb) {
+					if (encoderPinBLast) {
+						*encoderValue = *encoderValue + (!reverseRotation?+1:-1);
+					} else {
+						*encoderValue = *encoderValue  + (!reverseRotation?-1:+1);
+					}
 					changed = true;
 				}
 		  }
 
-			encoderValues = (encoderPinALast!=na)?encoderValues ^ bit(pinA):encoderValues;
-			encoderValues = (encoderPinBLast!=nb)?encoderValues ^ bit(pinB):encoderValues;
+		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):encoderValues;
+		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):encoderValues;
+		  PCF8574::attachInterrupt();
 
 			return changed;
 	}
+	int8_t PCF8574::readEncoderValuePoki(uint8_t pinA, uint8_t pinB) {
+		volatile long encoderValue = 0;
+		PCF8574::readEncoderValue(pinA, pinB, &encoderValue);
+		return encoderValue;
+	}
+
 #endif
 
-int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB) {
-	volatile long encoderValue = 0;
-	PCF8574::readEncoderValue(pinA, pinB, &encoderValue);
-	return encoderValue;
-}
 
 /**
  * Read value from i2c and bufferize it

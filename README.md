@@ -21,6 +21,9 @@ Tutorial:
 
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
 
+## Changelog
+23/11/2020: v2.2.2 Add multiple implementation for encoder management (you can enable by uncomment relative define)
+
 # Reef complete PCF8574 PCF8574AP digital input and output expander with i2c bus.
 I try to simplify the use of this IC, with a minimal set of operation.
 
