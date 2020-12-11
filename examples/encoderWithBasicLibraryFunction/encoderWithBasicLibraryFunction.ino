@@ -1,6 +1,6 @@
 /*
  * PCF8574 GPIO Port Expand
- * https://www.mischianti.org
+ * https://www.mischianti.org/2020/03/13/pcf8574-i2c-digital-i-o-expander-rotary-encoder-part-2/
  *
  * PCF8574    ----- WeMos
  * A0         ----- GRD
