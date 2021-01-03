@@ -1,4 +1,3 @@
-#include "Arduino.h"
 /*
  * 	PCF8574 GPIO Port Expand
  *  Blink all led
@@ -53,12 +52,12 @@ void setup()
     pcf8574.pinMode(i, OUTPUT);
   }
 
-	Serial.print("Init pcf8574...");
-	if (pcf8574.begin()){
-		Serial.println("OK");
-	}else{
-		Serial.println("KO");
-	}
+  Serial.print("Init pcf8574...");
+  if (pcf8574.begin()){
+    Serial.println("OK");
+  } else {
+    Serial.println("KO");
+  }
 }
 
 void loop()
