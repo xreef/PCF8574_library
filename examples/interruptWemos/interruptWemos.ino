@@ -34,7 +34,7 @@ PCF8574 pcf8574(0x20);
 // Function interrupt
 bool keyPressed = false;
 
-void keyPressedOnPCF8574(){
+void ICACHE_RAM_ATTR  keyPressedOnPCF8574(){
 //  Serial.println("keyPressedOnPCF8574");
   keyPressed = true;
 }

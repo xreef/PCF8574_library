@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.2.2
+ * VERSION: 2.2.3
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -52,7 +52,7 @@
 // Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
 // #define PCF8574_LOW_MEMORY
 
-// Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
+// Uncomment for low latency to get realtime data every time.
 // #define PCF8574_LOW_LATENCY
 
 //#define PCF8574_SOFT_INITIALIZATION
