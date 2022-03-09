@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/xreef/PCF8574_library.git"
   },
-  "version": "2.2.2",
+  "version": "2.2.4",
   "frameworks": "arduino",
   "platforms": "*"
 }
