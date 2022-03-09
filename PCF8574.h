@@ -230,19 +230,19 @@ private:
 	uint8_t _interruptPin = 2;
 	void (*_interruptFunction)(){};
 
-	byte writeMode 			= 	B00000000;
-	byte writeModeUp		= 	B00000000;
-	byte readMode 			= 	B00000000;
-	byte readModePullUp 	= 	B00000000;
-	byte readModePullDown 	= 	B00000000;
-	byte byteBuffered 		= 	B00000000;
-	byte resetInitial		= 	B00000000;
-	byte initialBuffer		= 	B00000000;
+	byte writeMode 			= 	0b00000000;
+	byte writeModeUp		= 	0b00000000;
+	byte readMode 			= 	0b00000000;
+	byte readModePullUp 	= 	0b00000000;
+	byte readModePullDown 	= 	0b00000000;
+	byte byteBuffered 		= 	0b00000000;
+	byte resetInitial		= 	0b00000000;
+	byte initialBuffer		= 	0b00000000;
 	unsigned long lastReadMillis = 0;
 
-	byte writeByteBuffered = B00000000;
+	byte writeByteBuffered = 0b00000000;
 
-	volatile byte encoderValues = B00000000;
+	volatile byte encoderValues = 0b00000000;
 
 	uint8_t prevNextCode = 0;
 	uint16_t store=0;
@@ -253,8 +253,8 @@ private:
 
 //	byte validCW = B11100001;
 //	byte validCCW = B01001011;
-	byte validCW = B01001011;
-	byte validCCW = B11100001;
+	byte validCW = 0b01001011;
+	byte validCCW = 0b11100001;
 
 	uint8_t transmissionStatus = 0;
 
