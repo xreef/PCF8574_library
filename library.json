@@ -1,7 +1,7 @@
 {
   "name": "PCF8574 library",
   "keywords": "library, digital, i2c, encoder, expander, pcf8574, io, sensor",
-  "description": "Library to use i2c digital expander with arduino, esp32, stm32 and esp8266. Can read write digital value with only 2 wire",
+  "description": "i2c digital expander for Arduino, esp32, SMT32 and ESP8266. Can read write digital values with only 2 wire. Very simple to use and encoder support",
   "authors": [
     {
       "name": "Renzo Mischianti",
