@@ -29,6 +29,8 @@ Tutorial:
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
 
 ## Changelog
+06/04/2022: v2.3.0 Fix package size
+30/12/2021: v2.2.4 Minor fix and remove deprecated declaration
 23/11/2020: v2.2.2 Add multiple implementation for encoder management (you can enable by uncomment relative define)
 
 # Reef complete PCF8574 PCF8574AP digital input and output expander with i2c bus.
@@ -133,5 +135,5 @@ void keyPressedOnPCF8574(){
 ```
 
 For the examples I use this wire schema on breadboard:
-![Breadboard](https://github.com/xreef/PCF8574_library/blob/master/resources/testReadWriteLedButton_bb.png)
+![Breadboard](https://github.com/xreef/PCF8574_library/raw/master/resources/testReadWriteLedButton_bb.png)
 
