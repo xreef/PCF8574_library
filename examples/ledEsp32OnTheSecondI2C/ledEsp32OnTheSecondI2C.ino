@@ -44,7 +44,7 @@ void setup()
 {
   Serial.begin(112560);
 
-  I2Cone.begin(16,17,400000); // SDA pin 16, SCL pin 17, 400kHz frequency
+  I2Cone.begin(16,17,400000U); // SDA pin 16, SCL pin 17, 400kHz frequency
   delay(1000);
 
   // Set pinMode to OUTPUT

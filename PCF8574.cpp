@@ -208,7 +208,6 @@ bool PCF8574::begin(){
 #endif
 		DEBUG_PRINTLN( resetInitial, BIN);
 
-		_wire->beginTransmission(_address);
 		_wire->write(resetInitial);
 
 		initialBuffer = writeModeUp | readModePullUp;

@@ -29,6 +29,7 @@ Tutorial:
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
 
 ## Changelog
+26/04/2022: v2.3.1 Fix example for esp32 and double begin.
 06/04/2022: v2.3.0 Fix package size
 30/12/2021: v2.2.4 Minor fix and remove deprecated declaration
 23/11/2020: v2.2.2 Add multiple implementation for encoder management (you can enable by uncomment relative define)
