@@ -29,6 +29,7 @@ Tutorial:
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
 
 ## Changelog
+28/07/2022: v2.3.3 Force SDA SCL to use GPIO numeration (https://www.mischianti.org/forums/topic/cannot-set-sda-clk-on-esp8266/).
 28/07/2022: v2.3.2 Fix the SDA SCL type #58 and add basic support for SAMD device.
 26/04/2022: v2.3.1 Fix example for esp32 and double begin issue #56.
 06/04/2022: v2.3.0 Fix package size

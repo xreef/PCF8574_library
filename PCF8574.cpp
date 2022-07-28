@@ -60,7 +60,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	 * @param sda: sda pin
 	 * @param scl: scl pin
 	 */
-	PCF8574::PCF8574(uint8_t address, uint8_t sda, uint8_t scl){
+	PCF8574::PCF8574(uint8_t address, int sda, int scl){
 		_wire = &Wire;
 
 		_address = address;
@@ -76,7 +76,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	 * @param interruptPin: pin to set interrupt
  	 * @param interruptFunction: function to call when interrupt raised
 	 */
-	PCF8574::PCF8574(uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)() ){
+	PCF8574::PCF8574(uint8_t address, int sda, int scl, uint8_t interruptPin,  void (*interruptFunction)() ){
 		_wire = &Wire;
 
 		_address = address;
@@ -122,7 +122,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	 * @param sda: sda pin
 	 * @param scl: scl pin
 	 */
-	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, uint8_t sda, uint8_t scl){
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, int sda, int scl){
 		_wire = pWire;
 
 		_address = address;
@@ -138,7 +138,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	 * @param interruptPin: pin to set interrupt
 	 * @param interruptFunction: function to call when interrupt raised
 	 */
-	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)() ){
+	PCF8574::PCF8574(TwoWire *pWire, uint8_t address, int sda, int scl, uint8_t interruptPin,  void (*interruptFunction)() ){
 		_wire = pWire;
 
 		_address = address;
