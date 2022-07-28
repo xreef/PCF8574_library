@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.3.1
+ * VERSION: 2.3.2
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -47,7 +47,7 @@
 #define DEFAULT_SCL SCL;
 
 // Uncomment to enable printing out nice debug messages.
- // #define PCF8574_DEBUG
+//  #define PCF8574_DEBUG
 
 // Uncomment for low memory usage this prevent use of complex DigitalInput structure and free 7byte of memory
 // #define PCF8574_LOW_MEMORY
@@ -109,7 +109,7 @@ public:
 	PCF8574(uint8_t address);
 	PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() );
 
-#if !defined(__AVR) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
+#if !defined(__AVR) && !defined(ARDUINO_ARCH_SAMD) && !defined(__STM32F1__) && !defined(TEENSYDUINO)
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl);
 	PCF8574(uint8_t address, uint8_t sda, uint8_t scl, uint8_t interruptPin,  void (*interruptFunction)());
 #endif
@@ -193,6 +193,8 @@ public:
 	}
 
 	bool isLastTransmissionSuccess(){
+		DEBUG_PRINT(F("STATUS --> "));
+		DEBUG_PRINTLN(transmissionStatus);
 		return transmissionStatus==0;
 	}
 private:
