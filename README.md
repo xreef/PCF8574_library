@@ -10,35 +10,26 @@
 </div>
 
 #
-#
-#
-#
-#
-#
 
-### Additional information and documentation on my site: [pcf8574 Article](https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/).
 
-### If you need more pins [here](https://www.mischianti.org/2019/07/22/pcf8575-i2c-16-bit-digital-i-o-expander/) you can find the pcf8575 16bit version of the IC.
+# PCF8574 PCF8574AP digital input and output expander with i2c bus.
+#### Complete documentation on my site: [pcf8574 Article](https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/).
 
-### Version 2.2
-
-Library to use I2C analog IC with arduino and esp8266. Can read and write digital value with only 2 wires (perfect for ESP-01).
-
-Tutorial: 
-
-To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder PCF8574. Check that the PCF8574 folder contains `PCF8574\\.cpp` and `PCF8574.h`. Place the DHT library folder your `<arduinosketchfolder>/libraries/` folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
+#### If you need more pins [here](https://www.mischianti.org/2019/07/22/pcf8575-i2c-16-bit-digital-i-o-expander/) you can find the pcf8575 16bit version of the IC.
 
 ## Changelog
-10/08/2022: v2.3.4 Add support for custom SERCOM interface of Arduino SAMD devices. Force SDA SCL to use GPIO numeration for STM32 bug (https://www.mischianti.org/forums/topic/compatible-with-stm32duino/). 
-28/07/2022: v2.3.3 Force SDA SCL to use GPIO numeration (https://www.mischianti.org/forums/topic/cannot-set-sda-clk-on-esp8266/).
-28/07/2022: v2.3.2 Fix the SDA SCL type #58 and add basic support for SAMD device.
-26/04/2022: v2.3.1 Fix example for esp32 and double begin issue #56.
-06/04/2022: v2.3.0 Fix package size
-30/12/2021: v2.2.4 Minor fix and remove deprecated declaration
-23/11/2020: v2.2.2 Add multiple implementation for encoder management (you can enable by uncomment relative define)
+ - 08/02/2023: v2.3.5 Fix STM32 support and add support for Raspberry Pi Pico and other rp2040 boards
+ - 10/08/2022: v2.3.4 Add support for custom SERCOM interface of Arduino SAMD devices. Force SDA SCL to use GPIO numeration for STM32 bug (https://www.mischianti.org/forums/topic/compatible-with-stm32duino/). 
+ - 28/07/2022: v2.3.3 Force SDA SCL to use GPIO numeration (https://www.mischianti.org/forums/topic/cannot-set-sda-clk-on-esp8266/).
+ - 28/07/2022: v2.3.2 Fix the SDA SCL type #58 and add basic support for SAMD device.
+ - 26/04/2022: v2.3.1 Fix example for esp32 and double begin issue #56.
+ - 06/04/2022: v2.3.0 Fix package size
+ - 30/12/2021: v2.2.4 Minor fix and remove deprecated declaration
+ - 23/11/2020: v2.2.2 Add multiple implementation for encoder management (you can enable by uncomment relative define)
 
-# Reef complete PCF8574 PCF8574AP digital input and output expander with i2c bus.
 I try to simplify the use of this IC, with a minimal set of operations.
+
+Tested with esp8266, esp32, Arduino, Arduino SAMD (Nano 33 IoT, MKR etc.), STM32 and rp2040 (Raspberry Pi Pico and similar)
 
 PCF8574P address map 0x20-0x27 
 PCF8574AP address map 0x38-0x3f 
