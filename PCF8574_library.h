@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.3.5
+ * VERSION: 2.3.6
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *

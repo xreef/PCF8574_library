@@ -1,6 +1,6 @@
 {
   "name": "PCF8574 library",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "keywords": "digital, i2c, encoder, expander, pcf8574, pcf8574a, esp32, esp8266, stm32, SAMD, Arduino, wire, rp2040, Raspberry",
   "description": "Most starred PCF8574 library. i2c digital expander for Arduino, Raspberry Pi Pico and rp2040 boards, esp32, SMT32 and ESP8266. Can read write digital values with only 2 wire. Very simple to use and encoder support.",
   "homepage": "https://www.mischianti.org/category/my-libraries/pcf8574/",

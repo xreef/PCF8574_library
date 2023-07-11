@@ -53,7 +53,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	_usingInterrupt = true;
 };
 
-#if !defined(__AVR) && !defined(ARDUINO_ARCH_SAMD) && !defined(TEENSYDUINO)
+#if !defined(__AVR) && !defined(ARDUINO_ARCH_SAMD) && !defined(TEENSYDUINO) && !defined(ARDUINO_ARCH_RENESAS)
 	/**
 	 * Constructor
 	 * @param address: i2c address
@@ -90,7 +90,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	};
 #endif
 
-#if defined(ESP32) || defined(ARDUINO_ARCH_SAMD)|| defined(ARDUINO_ARCH_RP2040)  || defined(ARDUINO_ARCH_STM32)
+#if defined(ESP32) || defined(ARDUINO_ARCH_SAMD)|| defined(ARDUINO_ARCH_RP2040)  || defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_RENESAS)
 	/**
 	 * Constructor
 	 * @param address: i2c address
@@ -186,7 +186,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
  */
 bool PCF8574::begin(){
 	this->transmissionStatus = 4;
-	#if !defined(__AVR)  && !defined(ARDUINO_ARCH_SAMD)  && !defined(TEENSYDUINO)
+	#if !defined(__AVR)  && !defined(ARDUINO_ARCH_SAMD)  && !defined(TEENSYDUINO) && !defined(ARDUINO_ARCH_RENESAS)
 		DEBUG_PRINT(F("begin(sda, scl) -> "));DEBUG_PRINT(_sda);DEBUG_PRINT(F(" "));DEBUG_PRINTLN(_scl);
 //		_wire->begin(_sda, _scl);
 #ifdef ARDUINO_ARCH_STM32
