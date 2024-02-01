@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.3.6
+ * VERSION: 2.3.7
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -125,6 +125,7 @@ public:
 #endif
 
 	bool begin();
+	bool begin(uint8_t address);
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
 	void encoder(uint8_t pinA, uint8_t pinB);

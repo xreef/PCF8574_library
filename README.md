@@ -18,6 +18,7 @@
 #### If you need more pins [here](https://www.mischianti.org/2019/07/22/pcf8575-i2c-16-bit-digital-i-o-expander/) you can find the pcf8575 16bit version of the IC.
 
 ## Changelog
+ - 01/02/2024: v2.3.7 Add the possibility to insert address at begin()
  - 10/07/2023: v2.3.6 Support for Arduino UNO R4
  - 08/02/2023: v2.3.5 Fix STM32 support and add support for Raspberry Pi Pico and other rp2040 boards
  - 10/08/2022: v2.3.4 Add support for custom SERCOM interface of Arduino SAMD devices. Force SDA SCL to use GPIO numeration for STM32 bug (https://www.mischianti.org/forums/topic/compatible-with-stm32duino/). 

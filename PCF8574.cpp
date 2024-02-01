@@ -181,6 +181,12 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 
 	}
 
+bool PCF8574::begin(uint8_t address){
+	_address = address;
+	return PCF8574::begin();
+}
+
+
 /**
  * wake up i2c controller
  */
