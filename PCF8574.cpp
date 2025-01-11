@@ -245,8 +245,6 @@ bool PCF8574::begin(){
 //		::attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
 //	}
 
-
-
 	PCF8574::attachInterrupt();
 
 	// inizialize last read
@@ -755,7 +753,8 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
  * @param force
  */
 void PCF8574::readBuffer(bool force){
-	if (millis() > PCF8574::lastReadMillis+latency || _usingInterrupt || force){
+//	if (millis() > PCF8574::lastReadMillis+latency || _usingInterrupt || force){
+	if (millis() - PCF8574::lastReadMillis > latency || _usingInterrupt || force){
 		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
 		if(_wire->available())   // If bytes are available to be recieved
@@ -888,7 +887,8 @@ uint8_t PCF8574::digitalRead(uint8_t pin, bool forceReadNow){
 		  }else{
 			  value = LOW;
 		  }
-	 }else if (forceReadNow || (millis() > PCF8574::lastReadMillis+latency)){
+//	 }else if (forceReadNow || (millis() > PCF8574::lastReadMillis+latency)){
+	 }else if (forceReadNow || (millis() - PCF8574::lastReadMillis > latency)){
 		 DEBUG_PRINT(" ...Read from buffer... ");
 		  _wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		  lastReadMillis = millis();
