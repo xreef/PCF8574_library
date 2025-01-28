@@ -39,7 +39,7 @@ PCF8574::PCF8574(uint8_t address){
 };
 
 /**
- * Construcor
+ * Constructor
  * @param address: i2c address
  * @param interruptPin: pin to set interrupt
  * @param interruptFunction: function to call when interrupt raised
@@ -102,7 +102,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	};
 
 	/**
-	 * Construcor
+	 * Constructor
 	 * @param address: i2c address
 	 * @param interruptPin: pin to set interrupt
 	 * @param interruptFunction: function to call when interrupt raised
@@ -247,14 +247,14 @@ bool PCF8574::begin(){
 
 	PCF8574::attachInterrupt();
 
-	// inizialize last read
+	// initialize last read
 	lastReadMillis = millis();
 
 	return this->isLastTransmissionSuccess();
 }
 
 /**
- * Set if fin is OUTPUT or INPUT
+ * Set if pin is OUTPUT or INPUT
  * @param pin: pin to set
  * @param mode: mode, supported only INPUT or OUTPUT (to simplify)
  * @param output_start: output_start, for OUTPUT we can set initial value
@@ -319,7 +319,7 @@ void PCF8574::pinMode(uint8_t pin, uint8_t mode, uint8_t output_start){
 		DEBUG_PRINTLN(readModePullUp, BIN);
 	}
 	else{
-		DEBUG_PRINTLN("Mode non supported by PCF8574")
+		DEBUG_PRINTLN("Mode not supported by PCF8574")
 	}
 };
 
@@ -771,7 +771,7 @@ void PCF8574::readBuffer(bool force){
 #ifndef PCF8574_LOW_MEMORY
 	/**
 	 * Read value of all INPUT pin
-	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * Debounce read faster than 10millis, not managed for interrupt mode
 	 * @return
 	 */
 	PCF8574::DigitalInput PCF8574::digitalReadAll(void){
@@ -825,14 +825,14 @@ void PCF8574::readBuffer(bool force){
 #else
 	/**
 	 * Read value of all INPUT pin in byte format for low memory usage
-	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * Debounce read faster than 10millis, not managed for interrupt mode
 	 * @return
 	 */
 	byte PCF8574::digitalReadAll(void){
 		DEBUG_PRINTLN("Read from buffer");
 		_wire->requestFrom(_address,(uint8_t)1);// Begin transmission to PCF8574 with the buttons
 		lastReadMillis = millis();
-		if(_wire->available())   // If bytes are available to be recieved
+		if(_wire->available())   // If bytes are available to be received
 		{
 			  DEBUG_PRINTLN("Data ready");
 			  byte iInput = _wire->read();// Read a byte
@@ -862,7 +862,7 @@ void PCF8574::readBuffer(bool force){
 
 /**
  * Read value of specified pin
- * Debounce read more fast than 10millis, non managed for interrupt mode
+ * Debounce read faster than 10millis, not managed for interrupt mode
  * @param pin
  * @return
  */
@@ -983,8 +983,8 @@ bool PCF8574::digitalWrite(uint8_t pin, uint8_t value){
 
 #ifndef PCF8574_LOW_MEMORY
 	/**
-	 * Read value of all INPUT pin
-	 * Debounce read more fast than 10millis, non managed for interrupt mode
+	 * Read value of all INPUT pins
+	 * Debounce read faster than 10millis, not managed for interrupt mode
 	 * @return
 	 */
 	void PCF8574::setVal(uint8_t pin, uint8_t value){
