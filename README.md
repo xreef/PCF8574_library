@@ -17,8 +17,8 @@ A simple and efficient library to use the PCF8574 I2C 8-bit digital I/O expander
 ## 📚 Documentation & Articles
 Complete documentation, tutorials, and examples are available on mischianti.org.
 
-- 🌐 **[PCF8574 Main Article](https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/)**: The primary guide for this library with wiring diagrams and detailed explanations.
-- 📖 **[PCF8575 16-bit I/O Expander](https://www.mischianti.org/2019/07/22/pcf8575-i2c-16-bit-digital-i-o-expander/)**: A guide for the 16-bit version of this IC.
+- 🌐 **[PCF8574 Main Article](https://mischianti.org/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/)**: The primary guide for this library with wiring diagrams and detailed explanations.
+- 📖 **[PCF8575 16-bit I/O Expander](https://mischianti.org/pcf8575-i2c-16-bit-digital-i-o-expander/)**: A guide for the 16-bit version of this IC.
 - 🛠️ **[I2C Scanner](https://playground.arduino.cc/Main/I2cScanner)**: A utility to find the I2C address of your device.
 - 💬 **[Support Forum (English)](https://www.mischianti.org/forums/forum/mischiantis-libraries/pcf8574-i2c-digital-i-o-expander/)**: Get help and discuss the library.
 - 💬 **[Forum di Supporto (Italiano)](https://www.mischianti.org/it/forums/forum/le-librerie-di-mischianti/pcf8574-expander-digitale-i-o-i2c/)**: Ottieni supporto e discuti della libreria.
