@@ -221,6 +221,12 @@ public:
 		DEBUG_PRINTLN(transmissionStatus);
 		return transmissionStatus==0;
 	}
+
+    // New convenience helper to probe the device on the I2C bus.
+    // Returns true when the PCF8574 at the configured address ACKs.
+    // This is a lightweight check you can call before a read/write to
+    // confirm the device is present.
+    bool isOnline();
 private:
 	uint8_t _address;
 

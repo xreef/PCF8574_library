@@ -75,6 +75,15 @@ BeginResult PCF8574::beginResult(uint8_t address){
 }
 #endif
 
+// New lightweight probe for users: isOnline
+bool PCF8574::isOnline(){
+    // Use TwoWire instance to probe for ACK. This mirrors the probe logic used when
+    // PCF8574_BEGIN_ENUM_RESULT is enabled.
+    _wire->beginTransmission(_address);
+    uint8_t err = _wire->endTransmission();
+    return (err == 0);
+}
+
 /**
  * Constructor
  * @param address: i2c address
@@ -704,7 +713,7 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 //			  DEBUG_PRINT(na);
 //			  DEBUG_PRINT(nb);
 //			  DEBUG_PRINTLN();
-//
+////
 ////			  Serial.print (" <------ ");
 //
 //				if (nb == LOW && nb!=na) {
@@ -1089,4 +1098,3 @@ bool PCF8574::digitalWriteAllBytes(byte allpins){
 	return this->isLastTransmissionSuccess();
 
 }
-
