@@ -330,7 +330,7 @@ Copyright (c) 2017-2025 Renzo Mischianti
 Contributions are welcome! Please fork the repository, create a feature branch, and submit a pull request.
 
 ## 📞 Support & Contact
-- **Documentation:** [https://www.mischianti.org/category/my-libraries/pcf8574-i2c-digital-i-o-expander/](https://www.mischianti.org/category/my-libraries/pcf8574-i2c-digital-i-o-expander/)
+- **Documentation:** [https://mischianti.org/category/my-libraries/pcf8574/](https://mischianti.org/category/my-libraries/pcf8574/)
 - **GitHub Issues:** [https://github.com/xreef/PCF8574_library/issues](https://github.com/xreef/PCF8574_library/issues)
 - **Author:** Renzo Mischianti ([@xreef](https://github.com/xreef))
 
