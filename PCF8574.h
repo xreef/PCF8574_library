@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.3.7
+ * VERSION: 2.3.8
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -103,6 +103,20 @@
 #include <math.h>
 
 
+// Uncomment to enable begin() to return a detailed enum result instead of only bool.
+// Define this in your sketch or uncomment below to enable the feature.
+// #define PCF8574_BEGIN_ENUM_RESULT
+
+#ifdef PCF8574_BEGIN_ENUM_RESULT
+#include <stdint.h>
+enum class BeginResult : uint8_t {
+    OK = 0,
+    I2C_ERROR,
+    NO_PINS_CONFIGURED,
+    INVALID_ADDRESS
+};
+#endif
+
 class PCF8574 {
 public:
 
@@ -124,8 +138,16 @@ public:
 	PCF8574(TwoWire *pWire, uint8_t address, int sda, int scl, uint8_t interruptPin,  void (*interruptFunction)());
 #endif
 
+	// Existing begin() API is kept for backward compatibility.
 	bool begin();
 	bool begin(uint8_t address);
+
+#ifdef PCF8574_BEGIN_ENUM_RESULT
+	// New more descriptive begin() variant available when PCF8574_BEGIN_ENUM_RESULT is defined.
+	BeginResult beginResult();
+	BeginResult beginResult(uint8_t address);
+#endif
+
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
 	void encoder(uint8_t pinA, uint8_t pinB);
