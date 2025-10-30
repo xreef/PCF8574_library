@@ -136,3 +136,75 @@ For the examples I use this wire schema on breadboard:
 ![Breadboard](https://github.com/xreef/PCF8574_library/raw/master/resources/testReadWriteLedButton_bb.png)
 
 https://downloads.arduino.cc/libraries/logs/github.com/xreef/PCF8574_library/
+
+## Example: Using an HC‑SR04 Ultrasonic Sensor
+
+Note: The HC‑SR04 normally requires a microcontroller digital pin with precise timing (native `pulseIn`). If you connect the `ECHO` pin to a PCF8574 input, measurements will be affected by I2C latency and polling; accuracy will therefore be reduced. Below are two approaches: "higher resolution" (uses `pulseIn`) and "low I2C traffic" (uses `pulseInPoll`).
+
+Wiring: connect TRIG to an Arduino digital pin, and ECHO to a PCF8574 pin configured as INPUT.
+
+Schematic example sketch:
+
+```cpp
+// Arduino side
+#include <Wire.h>
+#include <PCF8574.h>
+
+PCF8574 pcf(0x39); // example address
+
+const int trigPin = 9; // Arduino pin for TRIG
+const uint8_t echoPinPCF = P0; // PCF8574 pin connected to ECHO
+
+void setup(){
+  Serial.begin(115200);
+  pcf.begin();
+  pcf.pinMode(echoPinPCF, INPUT);
+  pinMode(trigPin, OUTPUT);
+}
+
+// Measure using pulseIn (forces immediate read; higher resolution but many I2C requests)
+unsigned long measureDistancePulseIn(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  unsigned long duration = pcf.pulseIn(echoPinPCF, HIGH, 30000UL); // 30 ms timeout
+  unsigned long distanceCm = duration / 29 / 2;
+  return distanceCm;
+}
+
+// Measure using pulseInPoll (fewer I2C reads; use pollIntervalMicros to tune the tradeoff)
+unsigned long measureDistancePulseInPoll(unsigned int pollIntervalMicros = 50){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  unsigned long duration = pcf.pulseInPoll(echoPinPCF, HIGH, 30000UL, pollIntervalMicros);
+  unsigned long distanceCm = duration / 29 / 2;
+  return distanceCm;
+}
+
+void loop(){
+  unsigned long d1 = measureDistancePulseIn();
+  Serial.print("Distance pulseIn: "); Serial.print(d1); Serial.println(" cm");
+
+  unsigned long d2 = measureDistancePulseInPoll(100); // polling 100 us
+  Serial.print("Distance pulseInPoll(100us): "); Serial.print(d2); Serial.println(" cm");
+
+  delay(500);
+}
+```
+
+Accuracy warnings
+- The `PCF8574` is an I2C I/O expander; each read requires an I2C transaction which introduces latency and timing jitter.
+- `pulseIn` forces many immediate reads and gives better time resolution than `pulseInPoll`, but it cannot match the precision of a native microcontroller pin measurement.
+- `pulseInPoll` reduces the number of I2C reads by sampling at configurable intervals (`pollIntervalMicros`), lowering bus load while reducing time resolution — choose a tradeoff that fits your application.
+- For accurate distance measurements (especially for short ranges where the echo pulse is brief) connect `ECHO` directly to a microcontroller digital pin and use the native `pulseIn`.
+
+Practical tips
+- Try `pollIntervalMicros` between 20 and 200 microseconds and test on your hardware to find a good compromise.
+- If `pulseIn` via PCF8574 produces inconsistent readings, try disabling other I2C activity during the measurement or use `pulseInPoll` with a shorter polling interval.

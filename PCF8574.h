@@ -157,6 +157,12 @@ public:
 
 	void readBuffer(bool force = true);
 	uint8_t digitalRead(uint8_t pin, bool forceReadNow = false);
+	// Measure length (in microseconds) of a pulse on the pin. Compatible with Arduino pulseIn semantics.
+	unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000UL);
+    // Measure length (in microseconds) of a pulse on the pin using timed polling to reduce I2C requests.
+    // pollIntervalMicros: how often (microseconds) to actually read from the PCF8574 (default 50us).
+    unsigned long pulseInPoll(uint8_t pin, uint8_t state, unsigned long timeout = 1000000UL, unsigned int pollIntervalMicros = 50);
+
 	#ifndef PCF8574_LOW_MEMORY
 		struct DigitalInput {
 			uint8_t p0;
@@ -295,4 +301,3 @@ private:
 };
 
 #endif
-

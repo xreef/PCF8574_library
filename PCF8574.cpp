@@ -1098,3 +1098,69 @@ bool PCF8574::digitalWriteAllBytes(byte allpins){
 	return this->isLastTransmissionSuccess();
 
 }
+
+/**
+ * Measure length (in microseconds) of a pulse on the specified pin.
+ * Similar semantics to Arduino's pulseIn, but uses PCF8574 digitalRead that can force an immediate read.
+ * @param pin: PCF8574 pin (0..7)
+ * @param state: HIGH or LOW - the state to measure the duration of
+ * @param timeout: timeout in microseconds
+ * @return pulse length in microseconds, 0 on timeout
+ */
+unsigned long PCF8574::pulseIn(uint8_t pin, uint8_t state, unsigned long timeout){
+    unsigned long startMicros = micros();
+    unsigned long timeoutTime = startMicros + timeout;
+
+    // Wait for any previous pulse to end
+    while (digitalRead(pin, true) == state) {
+        if (micros() > timeoutTime) return 0;
+    }
+
+    // Wait for the pulse to start
+    while (digitalRead(pin, true) != state) {
+        if (micros() > timeoutTime) return 0;
+    }
+    unsigned long pulseStart = micros();
+
+    // Wait for the pulse to end
+    while (digitalRead(pin, true) == state) {
+        if (micros() > timeoutTime) return 0;
+    }
+    unsigned long pulseEnd = micros();
+
+    return pulseEnd - pulseStart;
+}
+
+/**
+ * pulseInPoll: like pulseIn but polls at a configurable interval to reduce I2C traffic.
+ * pollIntervalMicros: time between actual reads from PCF8574. Larger -> fewer I2C reads, less precision.
+ */
+unsigned long PCF8574::pulseInPoll(uint8_t pin, uint8_t state, unsigned long timeout, unsigned int pollIntervalMicros){
+    unsigned long startMicros = micros();
+    unsigned long timeoutTime = startMicros + timeout;
+
+    // Wait for any previous pulse to end
+    while (true){
+        if (digitalRead(pin, true) != state) break;
+        if (micros() > timeoutTime) return 0;
+        if (pollIntervalMicros > 0) delayMicroseconds(pollIntervalMicros);
+    }
+
+    // Wait for the pulse to start
+    while (true){
+        if (digitalRead(pin, true) == state) break;
+        if (micros() > timeoutTime) return 0;
+        if (pollIntervalMicros > 0) delayMicroseconds(pollIntervalMicros);
+    }
+    unsigned long pulseStart = micros();
+
+    // Wait for the pulse to end
+    while (true){
+        if (digitalRead(pin, true) != state) break;
+        if (micros() > timeoutTime) return 0;
+        if (pollIntervalMicros > 0) delayMicroseconds(pollIntervalMicros);
+    }
+    unsigned long pulseEnd = micros();
+
+    return pulseEnd - pulseStart;
+}
