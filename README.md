@@ -1,4 +1,4 @@
-# PCF8574 I2C Digital I/O Expander Library
+'''# PCF8574 I2C Digital I/O Expander Library
 
 ![PCF8574 Library Logo](resources/pcf8574_library_logo.png)
 
@@ -18,6 +18,7 @@ A simple and efficient library to use the PCF8574 I2C 8-bit digital I/O expander
 Complete documentation, tutorials, and examples are available on mischianti.org.
 
 - 🌐 **[PCF8574 Main Article](https://mischianti.org/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/)**: The primary guide for this library with wiring diagrams and detailed explanations.
+- 📖 **[PCF8574 and rotary encoder](https://www.mischianti.org/pcf8574-i2c-digital-i-o-expander-rotary-encoder-part-2/)**: A guide to using a rotary encoder with the PCF8574.
 - 📖 **[PCF8575 16-bit I/O Expander](https://mischianti.org/pcf8575-i2c-16-bit-digital-i-o-expander/)**: A guide for the 16-bit version of this IC.
 - 🛠️ **[I2C Scanner](https://playground.arduino.cc/Main/I2cScanner)**: A utility to find the I2C address of your device.
 - 💬 **[Support Forum (English)](https://www.mischianti.org/forums/forum/mischiantis-libraries/pcf8574-i2c-digital-i-o-expander/)**: Get help and discuss the library.
@@ -330,10 +331,11 @@ Copyright (c) 2017-2025 Renzo Mischianti
 Contributions are welcome! Please fork the repository, create a feature branch, and submit a pull request.
 
 ## 📞 Support & Contact
-- **Documentation:** [https://mischianti.org/category/my-libraries/pcf8574/](https://mischianti.org/category/my-libraries/pcf8574/)
+- **Documentation:** [https://www.mischianti.org/category/my-libraries/pcf8574-i2c-digital-i-o-expander/](https://www.mischianti.org/category/my-libraries/pcf8574-i2c-digital-i-o-expander/)
 - **GitHub Issues:** [https://github.com/xreef/PCF8574_library/issues](https://github.com/xreef/PCF8574_library/issues)
 - **Author:** Renzo Mischianti ([@xreef](https://github.com/xreef))
 
 ---
 
 ⭐ If this library helped your project, please give it a star on GitHub!
+''
