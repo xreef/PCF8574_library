@@ -2,7 +2,7 @@
  * PCF8574 GPIO Port Expand
  *
  * AUTHOR:  Renzo Mischianti
- * VERSION: 2.3.8
+ * VERSION: 2.4.0
  *
  * https://www.mischianti.org/2019/01/02/pcf8574-i2c-digital-i-o-expander-fast-easy-usage/
  *
@@ -65,15 +65,15 @@
 // #define POKI_ENCODER_ALGORITHM
 
 // Define where debug output will be printed.
-#define DEBUG_PRINTER Serial
+#define PCF8574_DEBUG_PRINTER Serial
 
 // Setup debug printing macros.
 #ifdef PCF8574_DEBUG
-	#define DEBUG_PRINT(...) { DEBUG_PRINTER.print(__VA_ARGS__); }
-	#define DEBUG_PRINTLN(...) { DEBUG_PRINTER.println(__VA_ARGS__); }
+	#define PCF8574_DEBUG_PRINT(...) { PCF8574_DEBUG_PRINTER.print(__VA_ARGS__); }
+	#define PCF8574_DEBUG_PRINTLN(...) { PCF8574_DEBUG_PRINTER.println(__VA_ARGS__); }
 #else
-	#define DEBUG_PRINT(...) {}
-	#define DEBUG_PRINTLN(...) {}
+	#define PCF8574_DEBUG_PRINT(...) {}
+	#define PCF8574_DEBUG_PRINTLN(...) {}
 #endif
 
 #ifdef PCF8574_LOW_LATENCY
@@ -105,7 +105,7 @@
 
 // Uncomment to enable begin() to return a detailed enum result instead of only bool.
 // Define this in your sketch or uncomment below to enable the feature.
-// #define PCF8574_BEGIN_ENUM_RESULT
+#define PCF8574_BEGIN_ENUM_RESULT
 
 #ifdef PCF8574_BEGIN_ENUM_RESULT
 #include <stdint.h>
@@ -146,6 +146,17 @@ public:
 	// New more descriptive begin() variant available when PCF8574_BEGIN_ENUM_RESULT is defined.
 	BeginResult beginResult();
 	BeginResult beginResult(uint8_t address);
+
+	// Map BeginResult to a human-readable static string
+	static const char* beginResultToString(BeginResult result);
+
+    // Print a human-readable description of a BeginResult value (verbose option)
+    void printBeginResult(BeginResult result, bool verbose = true);
+
+    // Convenience wrappers that call beginResult() and optionally print diagnostics.
+    // Returns true when BeginResult::OK.
+    bool beginWithResultPrint(bool showDiagnostics = true);
+    bool beginWithResultPrint(uint8_t address, bool showDiagnostics = true);
 #endif
 
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
@@ -162,6 +173,28 @@ public:
     // Measure length (in microseconds) of a pulse on the pin using timed polling to reduce I2C requests.
     // pollIntervalMicros: how often (microseconds) to actually read from the PCF8574 (default 50us).
     unsigned long pulseInPoll(uint8_t pin, uint8_t state, unsigned long timeout = 1000000UL, unsigned int pollIntervalMicros = 50);
+
+	// Ultrasonic sensor methods (HC-SR04 compatible)
+	// Send trigger pulse and measure echo response (returns microseconds)
+	unsigned long ping(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+	// Same as ping but with polling to reduce I2C traffic
+	unsigned long pingPoll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+	// Get distance in centimeters (returns 0 on timeout)
+	unsigned long ping_cm(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+	// Get distance in centimeters with polling
+	unsigned long ping_cm_poll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+	// Get distance in inches (returns 0 on timeout)
+	unsigned long ping_in(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+	// Get distance in inches with polling
+	unsigned long ping_in_poll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+	// Get median distance from multiple samples (more stable readings)
+	unsigned long ping_median(uint8_t trigPin, uint8_t echoPin, uint8_t iterations = 5, unsigned long maxDistance_cm = 500);
+	// Get median distance with polling
+	unsigned long ping_median_poll(uint8_t trigPin, uint8_t echoPin, uint8_t iterations = 5, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+	// Convert microseconds to centimeters
+	static unsigned long microsecondsToDistance_cm(unsigned long microseconds);
+	// Convert microseconds to inches
+	static unsigned long microsecondsToDistance_in(unsigned long microseconds);
 
 	#ifndef PCF8574_LOW_MEMORY
 		struct DigitalInput {
@@ -223,8 +256,8 @@ public:
 	}
 
 	bool isLastTransmissionSuccess(){
-		DEBUG_PRINT(F("STATUS --> "));
-		DEBUG_PRINTLN(transmissionStatus);
+		 PCF8574_DEBUG_PRINT(F("STATUS --> "));
+		PCF8574_DEBUG_PRINTLN(transmissionStatus);
 		return transmissionStatus==0;
 	}
 

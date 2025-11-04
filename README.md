@@ -1,4 +1,4 @@
-'''# PCF8574 I2C Digital I/O Expander Library
+# PCF8574 I2C Digital I/O Expander Library
 
 ![PCF8574 Library Logo](resources/pcf8574_library_logo.png)
 
@@ -52,7 +52,7 @@ Complete documentation, tutorials, and examples are available on mischianti.org.
     - Custom I2C pins (SDA, SCL) can be specified for platforms like ESP8266/ESP32.
 - **Efficient Reading**: Read all 8 pin states in a single I2C transaction with `digitalReadAll()`.
 - **Low Memory Mode**: An optional mode to reduce RAM footprint on memory-constrained devices.
-- **Specialized Functions**: Includes `pulseIn()` and `pulseInPoll()` for reading pulse widths.
+- **Specialized Functions**: Includes `pulseIn()` and `pulseInPoll()` for reading pulse widths, plus NewPing-style ultrasonic sensor methods (`ping()`, `ping_cm()`, `ping_median()`, etc.) for easy HC-SR04 integration.
 
 ## 🎯 Supported Platforms
 
@@ -117,6 +117,22 @@ uint8_t digitalRead(uint8_t pin);
 
 // Read all 8 pins at once
 PCF8574::DigitalInput digitalReadAll();
+
+// Pulse measurement (low-level)
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+unsigned long pulseInPoll(uint8_t pin, uint8_t state, unsigned long timeout, unsigned int pollIntervalMicros);
+
+// Ultrasonic sensor methods (HC-SR04 compatible, NewPing-style)
+unsigned long ping(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+unsigned long pingPoll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+unsigned long ping_cm(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+unsigned long ping_cm_poll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+unsigned long ping_in(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500);
+unsigned long ping_in_poll(uint8_t trigPin, uint8_t echoPin, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+unsigned long ping_median(uint8_t trigPin, uint8_t echoPin, uint8_t iterations = 5, unsigned long maxDistance_cm = 500);
+unsigned long ping_median_poll(uint8_t trigPin, uint8_t echoPin, uint8_t iterations = 5, unsigned long maxDistance_cm = 500, unsigned int pollIntervalMicros = 100);
+static unsigned long microsecondsToDistance_cm(unsigned long microseconds);
+static unsigned long microsecondsToDistance_in(unsigned long microseconds);
 ```
 
 ## 💡 Basic Usage
@@ -162,7 +178,18 @@ void loop() {
 
   delay(100);
 }
-```
+
+/** Important:** Always configure PCF8574 pins with `pinMode()` (and set initial output levels with `digitalWrite()` if needed) before calling `begin()`. Some platforms or usage patterns rely on the initial pin configuration and calling `begin()` before `pinMode()` can lead to unexpected behavior. Example:
+
+```cpp
+pcf.pinMode(P0, OUTPUT);
+pcf.pinMode(P1, INPUT);
+// optional: pcf.digitalWrite(P0, LOW);
+if (!pcf.begin()) {
+  Serial.println(F("ERROR: Could not initialize PCF8574! Check wiring, I2C address, SDA/SCL and power."));
+  while (1) delay(100);
+}
+``` **/
 
 ## ⚡ Interrupts
 
@@ -266,9 +293,24 @@ bool p1 = (pinValues & bit(1)) > 0;
 
 ## Example: Using an HC-SR04 Ultrasonic Sensor
 
-The library includes `pulseIn()` and `pulseInPoll()` to measure pulse durations on PCF8574 pins. This is useful for sensors like the HC-SR04, but be aware of the limitations.
+The library includes specialized methods for working with HC-SR04 ultrasonic sensors, similar to the NewPing library. These methods simplify distance measurement and reduce I2C traffic.
 
-> **⚠️ Accuracy Warning:** Measuring pulses via an I2C expander is less precise than using a direct microcontroller pin. I2C communication adds latency and jitter. For high-accuracy needs, connect the sensor's `ECHO` pin directly to your microcontroller.
+> **⚠️ Accuracy Warning:** Measuring pulses via an I2C expander is less precise than using a direct microcontroller pin. I2C communication adds latency and jitter. The polling methods (`_poll` variants) trade some precision for much better I2C bus efficiency by reading at intervals instead of continuously. For high-accuracy needs, connect the sensor's `ECHO` pin directly to your microcontroller.
+
+### Available Ultrasonic Methods
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `ping(trigPin, echoPin, maxDistance_cm)` | Send trigger and measure echo pulse | Microseconds |
+| `pingPoll(trigPin, echoPin, maxDistance_cm, pollInterval)` | Ping with polling to reduce I2C traffic | Microseconds |
+| `ping_cm(trigPin, echoPin, maxDistance_cm)` | Get distance in centimeters | Centimeters |
+| `ping_cm_poll(trigPin, echoPin, maxDistance_cm, pollInterval)` | Distance in cm with polling (recommended) | Centimeters |
+| `ping_in(trigPin, echoPin, maxDistance_cm)` | Get distance in inches | Inches |
+| `ping_in_poll(trigPin, echoPin, maxDistance_cm, pollInterval)` | Distance in inches with polling | Inches |
+| `ping_median(trigPin, echoPin, iterations, maxDistance_cm)` | Median of multiple readings (most stable) | Centimeters |
+| `ping_median_poll(trigPin, echoPin, iterations, maxDistance_cm, pollInterval)` | Median with polling | Centimeters |
+
+### Basic Example (Original Methods)
 
 ```cpp
 #include <Wire.h>
@@ -309,7 +351,56 @@ void loop() {
 }
 ```
 
+### NewPing-Style Example (Recommended)
+
+For easier use and better I2C efficiency, use the new ultrasonic methods:
+
+```cpp
+#include <Wire.h>
+#include <PCF8574.h>
+
+PCF8574 pcf(0x20);
+
+const uint8_t trigPinPCF = P1;  // TRIG on PCF8574 P1
+const uint8_t echoPinPCF = P0;  // ECHO on PCF8574 P0
+const unsigned long MAX_DISTANCE = 400; // Maximum distance in cm
+
+void setup() {
+  Serial.begin(115200);
+  pcf.begin();
+  pcf.pinMode(trigPinPCF, OUTPUT);
+  pcf.pinMode(echoPinPCF, INPUT);
+  pcf.digitalWrite(trigPinPCF, LOW);
+}
+
+void loop() {
+  // Simple distance measurement in cm (with polling for efficiency)
+  unsigned long distance = pcf.ping_cm_poll(trigPinPCF, echoPinPCF, MAX_DISTANCE, 100);
+  
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  
+  // For more stable readings, use median of 5 samples
+  // unsigned long distance = pcf.ping_median_poll(trigPinPCF, echoPinPCF, 5, MAX_DISTANCE, 100);
+  
+  delay(500);
+}
+```
+
+### Understanding Polling Interval
+
+The `pollInterval` parameter (in microseconds) controls how often the PCF8574 is read:
+- **Smaller values (50-100µs)**: More precise timing, but more I2C traffic
+- **Larger values (200-500µs)**: Less I2C traffic, but reduced precision
+- **Recommended**: 100µs provides a good balance for most applications
+
+Example: `ping_cm_poll(trigPin, echoPin, 400, 100)` reads every 100µs, reducing I2C requests by ~10x compared to continuous reading.
+
+See the `HC-SR04_via_PCF8574` and `HC-SR04_via_PCF8574_extended` examples in the library for complete demonstrations.
+
 ## 📝 Changelog
+- 04/11/2025: v2.4.0 Add NewPing-style ultrasonic sensor methods (ping, ping_cm, ping_in, ping_median) for HC-SR04 support
 - 30/10/2025: v2.3.8 Add beginResult() to help users find their wrong code
 - 01/02/2024: v2.3.7 Add the possibility to insert address at begin()
 - 10/07/2023: v2.3.6 Support for Arduino UNO R4
@@ -338,4 +429,3 @@ Contributions are welcome! Please fork the repository, create a feature branch, 
 ---
 
 ⭐ If this library helped your project, please give it a star on GitHub!
-''
