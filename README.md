@@ -323,9 +323,16 @@ const uint8_t echoPinPCF = P0;  // A pin on the PCF8574
 
 void setup() {
   Serial.begin(115200);
-  pcf.begin();
+
+  // Configure pin modes BEFORE initializing the PCF8574
   pcf.pinMode(echoPinPCF, INPUT);
   pinMode(trigPin, OUTPUT);
+
+  // Initialize the PCF8574 (after pinMode)
+  if (!pcf.begin()) {
+    Serial.println("Couldn't find PCF8574");
+    while (1);
+  }
 }
 
 void loop() {
@@ -367,10 +374,17 @@ const unsigned long MAX_DISTANCE = 400; // Maximum distance in cm
 
 void setup() {
   Serial.begin(115200);
-  pcf.begin();
+
+  // Configure PCF8574 pins BEFORE calling begin()
   pcf.pinMode(trigPinPCF, OUTPUT);
   pcf.pinMode(echoPinPCF, INPUT);
   pcf.digitalWrite(trigPinPCF, LOW);
+
+  // Initialize PCF8574 after pins are configured
+  if (!pcf.begin()) {
+    Serial.println(F("ERROR: Could not initialize PCF8574! Check wiring, I2C address, SDA/SCL and power."));
+    while (1) delay(100);
+  }
 }
 
 void loop() {
@@ -380,9 +394,6 @@ void loop() {
   Serial.print("Distance: ");
   Serial.print(distance);
   Serial.println(" cm");
-  
-  // For more stable readings, use median of 5 samples
-  // unsigned long distance = pcf.ping_median_poll(trigPinPCF, echoPinPCF, 5, MAX_DISTANCE, 100);
   
   delay(500);
 }
